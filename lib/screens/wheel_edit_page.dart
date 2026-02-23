@@ -1,0 +1,567 @@
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
+import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
+import '../l10n/app_localizations.dart';
+import '../models/wheel_model.dart';
+import '../providers/wheel_provider.dart';
+import '../widgets/color_picker_dialog.dart';
+import '../widgets/wheel_painter.dart';
+
+const _defaultColors = [
+  Color(0xFFE53935), Color(0xFF1E88E5), Color(0xFF43A047),
+  Color(0xFFFDD835), Color(0xFFFF8F00), Color(0xFF8E24AA),
+  Color(0xFF00ACC1), Color(0xFFF4511E), Color(0xFF5E35B1),
+  Color(0xFF00897B), Color(0xFFD81B60), Color(0xFF7CB342),
+];
+
+class WheelEditPage extends StatefulWidget {
+  final WheelModel? wheel;
+  const WheelEditPage({super.key, this.wheel});
+
+  @override
+  State<WheelEditPage> createState() => _WheelEditPageState();
+}
+
+class _WheelEditPageState extends State<WheelEditPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _titleController = TextEditingController();
+  late WheelStyle _style;
+  late WheelSize _size;
+  late WheelForm _form;
+  late double _spinDuration;
+  late SpinSpeed _spinSpeed;
+  late PointerPosition _pointerPosition;
+  late bool _showResult;
+  late bool _enableSound;
+  late bool _is3D;
+  late String? _backgroundImagePath;
+  late List<WheelSegment> _segments;
+
+  bool get _isEditing => widget.wheel != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final w = widget.wheel;
+    _titleController.text = w?.title ?? '';
+    _style = w?.style ?? WheelStyle.classic;
+    _size = w?.size ?? WheelSize.medium;
+    _form = w?.form ?? WheelForm.standard;
+    _spinDuration = w?.spinDuration ?? 5.0;
+    _spinSpeed = w?.spinSpeed ?? SpinSpeed.normal;
+    _pointerPosition = w?.pointerPosition ?? PointerPosition.top;
+    _showResult = w?.showResult ?? true;
+    _enableSound = w?.enableSound ?? true;
+    _is3D = w?.is3D ?? false;
+    _backgroundImagePath = w?.backgroundImagePath;
+    _segments = w?.segments.map((s) => WheelSegment(
+      id: s.id, label: s.label, probability: s.probability,
+      color: s.color, ratio: s.ratio, iconName: s.iconName,
+    )).toList() ?? [];
+
+    if (_segments.isEmpty) {
+      _addDefaultSegments();
+    }
+  }
+
+  void _addDefaultSegments() {
+    for (int i = 0; i < 4; i++) {
+      _segments.add(WheelSegment(
+        id: const Uuid().v4(),
+        label: '',
+        probability: 25,
+        color: _defaultColors[i % _defaultColors.length],
+        ratio: 1.0,
+      ));
+    }
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_isEditing ? l10n.editWheel : l10n.createWheel),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.visibility_rounded),
+            tooltip: l10n.preview,
+            onPressed: _segments.length >= 2 ? _showPreview : null,
+          ),
+          FilledButton.icon(
+            onPressed: _save,
+            icon: const Icon(Icons.check, size: 18),
+            label: Text(l10n.save),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            // Title
+            TextFormField(
+              controller: _titleController,
+              decoration: InputDecoration(
+                labelText: l10n.wheelTitle,
+                hintText: l10n.wheelTitleHint,
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.title_rounded),
+              ),
+              validator: (v) => (v == null || v.trim().isEmpty) ? l10n.validationRequired : null,
+            ),
+            const SizedBox(height: 20),
+
+            // Style & Size row
+            Row(
+              children: [
+                Expanded(child: _buildDropdown<WheelStyle>(
+                  label: l10n.wheelStyle,
+                  value: _style,
+                  items: WheelStyle.values,
+                  labelFn: (v) => _styleLabel(l10n, v),
+                  onChanged: (v) => setState(() => _style = v!),
+                )),
+                const SizedBox(width: 12),
+                Expanded(child: _buildDropdown<WheelSize>(
+                  label: l10n.wheelSize,
+                  value: _size,
+                  items: WheelSize.values,
+                  labelFn: (v) => _sizeLabel(l10n, v),
+                  onChanged: (v) => setState(() => _size = v!),
+                )),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Form & Speed row
+            Row(
+              children: [
+                Expanded(child: _buildDropdown<WheelForm>(
+                  label: l10n.wheelForm,
+                  value: _form,
+                  items: WheelForm.values,
+                  labelFn: (v) => _formLabel(l10n, v),
+                  onChanged: (v) => setState(() => _form = v!),
+                )),
+                const SizedBox(width: 12),
+                Expanded(child: _buildDropdown<SpinSpeed>(
+                  label: l10n.spinSpeed,
+                  value: _spinSpeed,
+                  items: SpinSpeed.values,
+                  labelFn: (v) => _speedLabel(l10n, v),
+                  onChanged: (v) => setState(() => _spinSpeed = v!),
+                )),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Pointer & Duration row
+            Row(
+              children: [
+                Expanded(child: _buildDropdown<PointerPosition>(
+                  label: l10n.pointerPosition,
+                  value: _pointerPosition,
+                  items: PointerPosition.values,
+                  labelFn: (v) => _pointerLabel(l10n, v),
+                  onChanged: (v) => setState(() => _pointerPosition = v!),
+                )),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('${l10n.spinDuration}: ${_spinDuration.toStringAsFixed(1)}s',
+                          style: theme.textTheme.bodySmall),
+                      Slider(
+                        value: _spinDuration,
+                        min: 2,
+                        max: 15,
+                        divisions: 26,
+                        onChanged: (v) => setState(() => _spinDuration = v),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+
+            // Switches
+            SwitchListTile(
+              title: Text(l10n.showResult),
+              value: _showResult,
+              onChanged: (v) => setState(() => _showResult = v),
+            ),
+            SwitchListTile(
+              title: Text(l10n.enableSound),
+              value: _enableSound,
+              onChanged: (v) => setState(() => _enableSound = v),
+            ),
+            SwitchListTile(
+              title: Text(l10n.mode3D),
+              secondary: Icon(_is3D ? Icons.view_in_ar_rounded : Icons.crop_square_rounded),
+              value: _is3D,
+              onChanged: (v) => setState(() => _is3D = v),
+            ),
+            ListTile(
+              leading: const Icon(Icons.image_rounded),
+              title: Text(l10n.backgroundImage),
+              subtitle: _backgroundImagePath != null
+                  ? Text(_backgroundImagePath!, overflow: TextOverflow.ellipsis, maxLines: 1)
+                  : null,
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_backgroundImagePath != null)
+                    IconButton(
+                      icon: Icon(Icons.clear_rounded, color: theme.colorScheme.error),
+                      tooltip: l10n.clearImage,
+                      onPressed: () => setState(() => _backgroundImagePath = null),
+                    ),
+                  IconButton(
+                    icon: const Icon(Icons.photo_library_rounded),
+                    tooltip: l10n.pickImage,
+                    onPressed: _pickBackgroundImage,
+                  ),
+                ],
+              ),
+            ),
+
+            const Divider(height: 32),
+
+            // Segments header
+            Row(
+              children: [
+                Icon(Icons.pie_chart_rounded, color: theme.colorScheme.primary),
+                const SizedBox(width: 8),
+                Text(l10n.segments, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+                const Spacer(),
+                TextButton.icon(
+                  onPressed: _autoBalanceProbability,
+                  icon: const Icon(Icons.balance_rounded, size: 18),
+                  label: Text(l10n.probabilityAutoBalance, style: const TextStyle(fontSize: 12)),
+                ),
+                const SizedBox(width: 4),
+                TextButton.icon(
+                  onPressed: _autoBalanceRatio,
+                  icon: const Icon(Icons.equalizer_rounded, size: 18),
+                  label: Text(l10n.ratioAutoBalance, style: const TextStyle(fontSize: 12)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+
+            // Segment list
+            ..._segments.asMap().entries.map((entry) => _buildSegmentCard(entry.key, entry.value, l10n, theme)),
+
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: _addSegment,
+              icon: const Icon(Icons.add_rounded),
+              label: Text(l10n.addSegment),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+            ),
+            const SizedBox(height: 80),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDropdown<T>({
+    required String label,
+    required T value,
+    required List<T> items,
+    required String Function(T) labelFn,
+    required ValueChanged<T?> onChanged,
+  }) {
+    return DropdownButtonFormField<T>(
+      initialValue: value,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      ),
+      items: items.map((e) => DropdownMenuItem(value: e, child: Text(labelFn(e)))).toList(),
+      onChanged: onChanged,
+    );
+  }
+
+  Widget _buildSegmentCard(int index, WheelSegment segment, AppLocalizations l10n, ThemeData theme) {
+    return Card(
+      key: ValueKey(segment.id),
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text('${index + 1}', style: TextStyle(fontWeight: FontWeight.w600, color: theme.colorScheme.onPrimaryContainer)),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: TextFormField(
+                    initialValue: segment.label,
+                    decoration: InputDecoration(
+                      labelText: l10n.segmentLabel,
+                      hintText: l10n.segmentLabelHint,
+                      border: const OutlineInputBorder(),
+                      isDense: true,
+                    ),
+                    onChanged: (v) => segment.label = v,
+                    validator: (v) => (v == null || v.trim().isEmpty) ? l10n.validationRequired : null,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: Icon(Icons.delete_outline_rounded, color: theme.colorScheme.error),
+                  tooltip: l10n.deleteSegment,
+                  onPressed: _segments.length > 2
+                      ? () => setState(() => _segments.removeAt(index))
+                      : null,
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                // Color picker
+                GestureDetector(
+                  onTap: () async {
+                    final color = await showDialog<Color>(
+                      context: context,
+                      builder: (_) => ColorPickerDialog(initialColor: segment.color),
+                    );
+                    if (color != null) setState(() => segment.color = color);
+                  },
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: segment.color,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: theme.colorScheme.outline.withAlpha(80)),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // Probability
+                Expanded(
+                  child: TextFormField(
+                    initialValue: segment.probability.toStringAsFixed(1),
+                    decoration: InputDecoration(
+                      labelText: l10n.segmentProbability,
+                      border: const OutlineInputBorder(),
+                      isDense: true,
+                      suffixText: '%',
+                    ),
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    onChanged: (v) {
+                      final val = double.tryParse(v);
+                      if (val != null) segment.probability = val;
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // Ratio
+                Expanded(
+                  child: TextFormField(
+                    initialValue: segment.ratio.toStringAsFixed(1),
+                    decoration: InputDecoration(
+                      labelText: l10n.segmentRatio,
+                      border: const OutlineInputBorder(),
+                      isDense: true,
+                    ),
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    onChanged: (v) {
+                      final val = double.tryParse(v);
+                      if (val != null && val > 0) segment.ratio = val;
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _addSegment() {
+    setState(() {
+      _segments.add(WheelSegment(
+        id: const Uuid().v4(),
+        label: '',
+        probability: 0,
+        color: _defaultColors[_segments.length % _defaultColors.length],
+        ratio: 1.0,
+      ));
+    });
+  }
+
+  void _autoBalanceProbability() {
+    if (_segments.isEmpty) return;
+    final each = 100.0 / _segments.length;
+    setState(() {
+      for (final s in _segments) {
+        s.probability = double.parse(each.toStringAsFixed(1));
+      }
+    });
+  }
+
+  void _autoBalanceRatio() {
+    setState(() {
+      for (final s in _segments) {
+        s.ratio = 1.0;
+      }
+    });
+  }
+
+  void _showPreview() {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => Dialog(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(_titleController.text.isEmpty ? l10n.preview : _titleController.text,
+                  style: Theme.of(dialogCtx).textTheme.titleLarge),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: 280,
+                height: 280,
+                child: CustomPaint(
+                  painter: WheelPainter(segments: _segments, style: _style, form: _form),
+                ),
+              ),
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: () => Navigator.pop(dialogCtx),
+                child: Text(l10n.close),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _save() {
+    if (!_formKey.currentState!.validate()) return;
+    if (_segments.length < 2) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.validationMinSegments)),
+      );
+      return;
+    }
+
+    final now = DateTime.now();
+    final wheel = WheelModel(
+      id: widget.wheel?.id ?? const Uuid().v4(),
+      title: _titleController.text.trim(),
+      style: _style,
+      size: _size,
+      form: _form,
+      spinDuration: _spinDuration,
+      spinSpeed: _spinSpeed,
+      pointerPosition: _pointerPosition,
+      showResult: _showResult,
+      enableSound: _enableSound,
+      is3D: _is3D,
+      backgroundImagePath: _backgroundImagePath,
+      segments: _segments,
+      createdAt: widget.wheel?.createdAt ?? now,
+      updatedAt: now,
+    );
+
+    final provider = context.read<WheelProvider>();
+    if (_isEditing) {
+      provider.updateWheel(wheel);
+    } else {
+      provider.addWheel(wheel);
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppLocalizations.of(context)!.savedSuccess)),
+    );
+    Navigator.pop(context);
+  }
+
+  Future<void> _pickBackgroundImage() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+    if (picked == null) return;
+    final appDir = await getApplicationDocumentsDirectory();
+    final fileName = '${const Uuid().v4()}${p.extension(picked.path)}';
+    final savedFile = await File(picked.path).copy(p.join(appDir.path, fileName));
+    setState(() => _backgroundImagePath = savedFile.path);
+  }
+
+  String _styleLabel(AppLocalizations l10n, WheelStyle s) => switch (s) {
+    WheelStyle.classic => l10n.styleClassic,
+    WheelStyle.neon => l10n.styleNeon,
+    WheelStyle.candy => l10n.styleCandy,
+    WheelStyle.elegant => l10n.styleElegant,
+    WheelStyle.gradient => l10n.styleGradient,
+    WheelStyle.retro => l10n.styleRetro,
+    WheelStyle.ocean => l10n.styleOcean,
+    WheelStyle.sunset => l10n.styleSunset,
+    WheelStyle.metallic => l10n.styleMetallic,
+    WheelStyle.pastel => l10n.stylePastel,
+    WheelStyle.dark => l10n.styleDark,
+    WheelStyle.rainbow => l10n.styleRainbow,
+  };
+
+  String _sizeLabel(AppLocalizations l10n, WheelSize s) => switch (s) {
+    WheelSize.small => l10n.sizeSmall,
+    WheelSize.medium => l10n.sizeMedium,
+    WheelSize.large => l10n.sizeLarge,
+  };
+
+  String _formLabel(AppLocalizations l10n, WheelForm f) => switch (f) {
+    WheelForm.standard => l10n.formStandard,
+    WheelForm.petal => l10n.formPetal,
+    WheelForm.star => l10n.formStar,
+    WheelForm.polygon => l10n.formPolygon,
+  };
+
+  String _speedLabel(AppLocalizations l10n, SpinSpeed s) => switch (s) {
+    SpinSpeed.slow => l10n.speedSlow,
+    SpinSpeed.normal => l10n.speedNormal,
+    SpinSpeed.fast => l10n.speedFast,
+  };
+
+  String _pointerLabel(AppLocalizations l10n, PointerPosition p) => switch (p) {
+    PointerPosition.top => l10n.pointerTop,
+    PointerPosition.right => l10n.pointerRight,
+  };
+}
