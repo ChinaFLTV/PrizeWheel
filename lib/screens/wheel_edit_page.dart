@@ -84,6 +84,7 @@ class _WheelEditPageState extends State<WheelEditPage> {
     _segments = w?.segments.map((s) => WheelSegment(
       id: s.id, label: s.label, probability: s.probability,
       color: s.color, ratio: s.ratio, iconName: s.iconName,
+      iconSize: s.iconSize, iconRotation: s.iconRotation,
     )).toList() ?? [];
 
     if (_segments.isEmpty) {
@@ -543,7 +544,183 @@ class _WheelEditPageState extends State<WheelEditPage> {
                 ),
               ],
             ),
+            const SizedBox(height: 10),
+            // Emoji icon row
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: () => _showEmojiPicker(segment),
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: theme.colorScheme.outline.withAlpha(80)),
+                    ),
+                    alignment: Alignment.center,
+                    child: segment.iconName != null
+                        ? Text(segment.iconName!, style: const TextStyle(fontSize: 20))
+                        : Icon(Icons.emoji_emotions_outlined, size: 18, color: theme.colorScheme.outline),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(l10n.segmentIcon, style: theme.textTheme.bodySmall),
+                if (segment.iconName != null) ...[
+                  const SizedBox(width: 4),
+                  GestureDetector(
+                    onTap: () => setState(() {
+                      segment.iconName = null;
+                      segment.iconSize = 1.0;
+                      segment.iconRotation = 0.0;
+                    }),
+                    child: Icon(Icons.clear_rounded, size: 16, color: theme.colorScheme.error),
+                  ),
+                ],
+              ],
+            ),
+            // Emoji size & rotation sliders (only when icon is set)
+            if (segment.iconName != null) ...[
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  Icon(Icons.format_size_rounded, size: 16, color: theme.colorScheme.outline),
+                  Expanded(
+                    child: Slider(
+                      value: segment.iconSize,
+                      min: 0.5,
+                      max: 2.0,
+                      divisions: 15,
+                      onChanged: (v) => setState(() => segment.iconSize = v),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 36,
+                    child: Text('${(segment.iconSize * 100).toInt()}%',
+                        style: theme.textTheme.labelSmall, textAlign: TextAlign.center),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Icon(Icons.rotate_right_rounded, size: 16, color: theme.colorScheme.outline),
+                  Expanded(
+                    child: Slider(
+                      value: segment.iconRotation,
+                      min: -3.14159,
+                      max: 3.14159,
+                      divisions: 24,
+                      onChanged: (v) => setState(() => segment.iconRotation = v),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 36,
+                    child: Text('${(segment.iconRotation * 180 / 3.14159).toInt()}°',
+                        style: theme.textTheme.labelSmall, textAlign: TextAlign.center),
+                  ),
+                ],
+              ),
+            ],
           ],
+        ),
+      ),
+    );
+  }
+
+  static const _emojiCategories = <String, List<String>>{
+    '😀': ['😀','😂','🤣','😊','😍','🥰','😎','🤩','😇','🥳','😋','🤗','🤔','😏','😴','🤯','🥺','😱','😈','🤡'],
+    '🎉': ['🎉','🎊','🎁','🎈','🏆','🥇','🥈','🥉','🎯','🎲','🎰','🎳','🎮','🕹️','🎵','🎶','🎸','🎺','🎭','🎬'],
+    '🍕': ['🍕','🍔','🍟','🌭','🍿','🧁','🍰','🎂','🍩','🍪','🍫','🍬','🍭','🍮','🍯','🍎','🍉','🍇','🍓','🥝'],
+    '🐶': ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🦄','🐝'],
+    '⚽': ['⚽','🏀','🏈','⚾','🎾','🏐','🏉','🎱','🏓','🏸','🥊','🏋️','🚴','🏊','🤸','⛷️','🏂','🏄','🧗','🤺'],
+    '❤️': ['❤️','🧡','💛','💚','💙','💜','🖤','🤍','💔','❣️','💕','💞','💓','💗','💖','💘','💝','💟','♥️','🫶'],
+    '🌟': ['🌟','⭐','✨','💫','🔥','💥','🌈','☀️','🌙','⚡','❄️','🌊','🍀','🌸','🌺','🌻','🌹','💎','👑','🔮'],
+    '🚗': ['🚗','🚕','🚌','🏎️','🚓','🚑','🚒','✈️','🚀','🛸','🚁','⛵','🚢','🚂','🏠','🏰','🗼','🎡','🎢','🗽'],
+  };
+
+  void _showEmojiPicker(WheelSegment segment) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    String selectedCategory = _emojiCategories.keys.first;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheetState) => SizedBox(
+          height: MediaQuery.of(ctx).size.height * 0.5,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                child: Row(
+                  children: [
+                    Text(l10n.segmentIcon, style: theme.textTheme.titleMedium),
+                    const Spacer(),
+                    if (segment.iconName != null)
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            segment.iconName = null;
+                            segment.iconSize = 1.0;
+                            segment.iconRotation = 0.0;
+                          });
+                          Navigator.pop(ctx);
+                        },
+                        child: Text(l10n.clearImage),
+                      ),
+                  ],
+                ),
+              ),
+              // Category tabs
+              SizedBox(
+                height: 44,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  children: _emojiCategories.keys.map((cat) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    child: ChoiceChip(
+                      label: Text(cat, style: const TextStyle(fontSize: 18)),
+                      selected: selectedCategory == cat,
+                      onSelected: (_) => setSheetState(() => selectedCategory = cat),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  )).toList(),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Expanded(
+                child: GridView.builder(
+                  padding: const EdgeInsets.all(8),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 7,
+                    mainAxisSpacing: 4,
+                    crossAxisSpacing: 4,
+                  ),
+                  itemCount: _emojiCategories[selectedCategory]!.length,
+                  itemBuilder: (_, i) {
+                    final emoji = _emojiCategories[selectedCategory]![i];
+                    final isSelected = segment.iconName == emoji;
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() => segment.iconName = emoji);
+                        Navigator.pop(ctx);
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: isSelected ? theme.colorScheme.primaryContainer : null,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(emoji, style: const TextStyle(fontSize: 24)),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

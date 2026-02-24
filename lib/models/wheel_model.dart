@@ -20,6 +20,8 @@ class WheelSegment {
   Color color;
   double ratio;
   String? iconName;
+  double iconSize;
+  double iconRotation; // radians
 
   WheelSegment({
     required this.id,
@@ -28,6 +30,8 @@ class WheelSegment {
     this.color = Colors.blue,
     this.ratio = 1.0,
     this.iconName,
+    this.iconSize = 1.0,
+    this.iconRotation = 0.0,
   });
 
   Map<String, dynamic> toMap() => {
@@ -37,6 +41,8 @@ class WheelSegment {
     'color': color.toARGB32(),
     'ratio': ratio,
     'iconName': iconName,
+    'iconSize': iconSize,
+    'iconRotation': iconRotation,
   };
 
   factory WheelSegment.fromMap(Map<String, dynamic> map) => WheelSegment(
@@ -46,6 +52,8 @@ class WheelSegment {
     color: Color(map['color'] as int),
     ratio: (map['ratio'] as num).toDouble(),
     iconName: map['iconName'] as String?,
+    iconSize: (map['iconSize'] as num?)?.toDouble() ?? 1.0,
+    iconRotation: (map['iconRotation'] as num?)?.toDouble() ?? 0.0,
   );
 }
 

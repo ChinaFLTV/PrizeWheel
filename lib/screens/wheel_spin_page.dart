@@ -34,7 +34,9 @@ class _WheelSpinPageState extends State<WheelSpinPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        icon: const Icon(Icons.celebration_rounded, size: 48),
+        icon: segment.iconName != null
+            ? Text(segment.iconName!, style: const TextStyle(fontSize: 48))
+            : const Icon(Icons.celebration_rounded, size: 48),
         title: Text(l10n.congratulations),
         content: Text(l10n.youWon(segment.label),
           style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.center),
@@ -545,7 +547,7 @@ class _MultiResultRevealPageState extends State<_MultiResultRevealPage>
     final total = results.length;
     final countMap = <String, _PrizeStat>{};
     for (final seg in results) {
-      final stat = countMap.putIfAbsent(seg.label, () => _PrizeStat(seg.label, seg.color, 0));
+      final stat = countMap.putIfAbsent(seg.label, () => _PrizeStat(seg.label, seg.color, seg.iconName, 0));
       stat.count++;
     }
     final stats = countMap.values.toList()..sort((a, b) => b.count.compareTo(a.count));
@@ -575,7 +577,9 @@ class _MultiResultRevealPageState extends State<_MultiResultRevealPage>
             return Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: Row(children: [
-                Container(width: 10, height: 10, decoration: BoxDecoration(color: s.color, shape: BoxShape.circle)),
+                s.icon != null
+                    ? SizedBox(width: 16, child: Text(s.icon!, style: const TextStyle(fontSize: 12)))
+                    : Container(width: 10, height: 10, decoration: BoxDecoration(color: s.color, shape: BoxShape.circle)),
                 const SizedBox(width: 8),
                 Expanded(
                   flex: 3,
@@ -703,11 +707,13 @@ class _MultiResultRevealPageState extends State<_MultiResultRevealPage>
               Center(child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
                 child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [Colors.white.withAlpha(35), Colors.transparent], radius: 0.8)),
-                    child: Icon(Icons.auto_awesome_rounded, size: 22, color: textColor.withAlpha(220)),
-                  ),
+                  segment.iconName != null
+                      ? Text(segment.iconName!, style: const TextStyle(fontSize: 24))
+                      : Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [Colors.white.withAlpha(35), Colors.transparent], radius: 0.8)),
+                          child: Icon(Icons.auto_awesome_rounded, size: 22, color: textColor.withAlpha(220)),
+                        ),
                   const SizedBox(height: 4),
                   Text(segment.label, style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.bold, height: 1.2,
                     shadows: [Shadow(color: Colors.black.withAlpha(60), blurRadius: 4)]),
@@ -741,6 +747,7 @@ class _MultiResultRevealPageState extends State<_MultiResultRevealPage>
 class _PrizeStat {
   final String label;
   final Color color;
+  final String? icon;
   int count;
-  _PrizeStat(this.label, this.color, this.count);
+  _PrizeStat(this.label, this.color, this.icon, this.count);
 }

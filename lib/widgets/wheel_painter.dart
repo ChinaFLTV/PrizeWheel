@@ -221,7 +221,8 @@ class WheelPainter extends CustomPainter {
 
   void _drawSegmentText(Canvas canvas, Offset center, double radius, double startAngle, double sweepAngle, WheelSegment segment) {
     final textAngle = startAngle + sweepAngle / 2;
-    final textRadius = radius * 0.62;
+    final hasIcon = segment.iconName != null && segment.iconName!.isNotEmpty;
+    final textRadius = hasIcon ? radius * 0.55 : radius * 0.62;
     final textX = center.dx + textRadius * cos(textAngle);
     final textY = center.dy + textRadius * sin(textAngle);
 
@@ -242,6 +243,24 @@ class WheelPainter extends CustomPainter {
       shadows.add(Shadow(color: Colors.cyanAccent.withAlpha(100), blurRadius: 8));
     }
 
+    // Draw emoji icon above text
+    if (hasIcon) {
+      final iconFontSize = _calculateFontSize(radius, segments.length) * 2.0 * segment.iconSize;
+      canvas.save();
+      canvas.rotate(segment.iconRotation);
+      final iconPainter = TextPainter(
+        text: TextSpan(
+          text: segment.iconName,
+          style: TextStyle(fontSize: iconFontSize),
+        ),
+        textDirection: TextDirection.ltr,
+        textAlign: TextAlign.center,
+      );
+      iconPainter.layout();
+      iconPainter.paint(canvas, Offset(-iconPainter.width / 2, -iconPainter.height - 2));
+      canvas.restore();
+    }
+
     final textPainter = TextPainter(
       text: TextSpan(
         text: segment.label,
@@ -259,7 +278,7 @@ class WheelPainter extends CustomPainter {
       ellipsis: '…',
     );
     textPainter.layout(maxWidth: radius * 0.45);
-    textPainter.paint(canvas, Offset(-textPainter.width / 2, -textPainter.height / 2));
+    textPainter.paint(canvas, Offset(-textPainter.width / 2, hasIcon ? 0 : -textPainter.height / 2));
 
     canvas.restore();
   }
