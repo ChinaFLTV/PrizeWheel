@@ -41,6 +41,10 @@ class _WheelEditPageState extends State<WheelEditPage> {
   late String? _backgroundImagePath;
   late List<WheelSegment> _segments;
 
+  // Controllers for probability and ratio fields, keyed by segment id
+  final Map<String, TextEditingController> _probControllers = {};
+  final Map<String, TextEditingController> _ratioControllers = {};
+
   bool get _isEditing => widget.wheel != null;
 
   @override
@@ -66,6 +70,16 @@ class _WheelEditPageState extends State<WheelEditPage> {
     if (_segments.isEmpty) {
       _addDefaultSegments();
     }
+    _initSegmentControllers();
+  }
+
+  void _initSegmentControllers() {
+    _probControllers.clear();
+    _ratioControllers.clear();
+    for (final s in _segments) {
+      _probControllers[s.id] = TextEditingController(text: s.probability.toStringAsFixed(1));
+      _ratioControllers[s.id] = TextEditingController(text: s.ratio.toStringAsFixed(1));
+    }
   }
 
   void _addDefaultSegments() {
@@ -83,6 +97,12 @@ class _WheelEditPageState extends State<WheelEditPage> {
   @override
   void dispose() {
     _titleController.dispose();
+    for (final c in _probControllers.values) {
+      c.dispose();
+    }
+    for (final c in _ratioControllers.values) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -343,7 +363,11 @@ class _WheelEditPageState extends State<WheelEditPage> {
                   icon: Icon(Icons.delete_outline_rounded, color: theme.colorScheme.error),
                   tooltip: l10n.deleteSegment,
                   onPressed: _segments.length > 2
-                      ? () => setState(() => _segments.removeAt(index))
+                      ? () => setState(() {
+                          final removed = _segments.removeAt(index);
+                          _probControllers.remove(removed.id)?.dispose();
+                          _ratioControllers.remove(removed.id)?.dispose();
+                        })
                       : null,
                 ),
               ],
@@ -374,7 +398,7 @@ class _WheelEditPageState extends State<WheelEditPage> {
                 // Probability
                 Expanded(
                   child: TextFormField(
-                    initialValue: segment.probability.toStringAsFixed(1),
+                    controller: _probControllers[segment.id],
                     decoration: InputDecoration(
                       labelText: l10n.segmentProbability,
                       border: const OutlineInputBorder(),
@@ -392,7 +416,7 @@ class _WheelEditPageState extends State<WheelEditPage> {
                 // Ratio
                 Expanded(
                   child: TextFormField(
-                    initialValue: segment.ratio.toStringAsFixed(1),
+                    controller: _ratioControllers[segment.id],
                     decoration: InputDecoration(
                       labelText: l10n.segmentRatio,
                       border: const OutlineInputBorder(),
@@ -415,22 +439,26 @@ class _WheelEditPageState extends State<WheelEditPage> {
 
   void _addSegment() {
     setState(() {
-      _segments.add(WheelSegment(
+      final segment = WheelSegment(
         id: const Uuid().v4(),
         label: '',
         probability: 0,
         color: _defaultColors[_segments.length % _defaultColors.length],
         ratio: 1.0,
-      ));
+      );
+      _segments.add(segment);
+      _probControllers[segment.id] = TextEditingController(text: segment.probability.toStringAsFixed(1));
+      _ratioControllers[segment.id] = TextEditingController(text: segment.ratio.toStringAsFixed(1));
     });
   }
 
   void _autoBalanceProbability() {
     if (_segments.isEmpty) return;
-    final each = 100.0 / _segments.length;
+    final each = double.parse((100.0 / _segments.length).toStringAsFixed(1));
     setState(() {
       for (final s in _segments) {
-        s.probability = double.parse(each.toStringAsFixed(1));
+        s.probability = each;
+        _probControllers[s.id]?.text = each.toStringAsFixed(1);
       }
     });
   }
@@ -439,6 +467,7 @@ class _WheelEditPageState extends State<WheelEditPage> {
     setState(() {
       for (final s in _segments) {
         s.ratio = 1.0;
+        _ratioControllers[s.id]?.text = '1.0';
       }
     });
   }
