@@ -340,4 +340,93 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get bgOverlayColor => 'Overlay-Farbton';
+
+  @override
+  String get pointerBottom => 'Unten';
+
+  @override
+  String get pointerLeft => 'Links';
+
+  @override
+  String get pointerStyle => 'Zeigerstil';
+
+  @override
+  String get pointerStyleClassic => 'Klassisch';
+
+  @override
+  String get pointerStyleArrow => 'Pfeil';
+
+  @override
+  String get pointerStyleDiamond => 'Diamant';
+
+  @override
+  String get pointerStyleDot => 'Punkt';
+
+  @override
+  String get pointerStyleFlag => 'Flagge';
+
+  @override
+  String get multiSpin => 'Mehrfach drehen';
+
+  @override
+  String get multiSpinTitle => 'Anzahl wählen';
+
+  @override
+  String multiSpinOption(int count) {
+    return '$count Mal drehen';
+  }
+
+  @override
+  String multiSpinResult(int count) {
+    return '${count}x Drehergebnisse';
+  }
+
+  @override
+  String get revealAll => 'Alle aufdecken';
+
+  @override
+  String get customSpinCount => 'Benutzerdefiniert';
+
+  @override
+  String customSpinCountError(int min, int max) {
+    return 'Bitte eine Zahl zwischen $min und $max eingeben';
+  }
+
+  @override
+  String get skipSpinAnimation => 'Animation überspringen';
+
+  @override
+  String get singleSpin => 'Einzeldrehung';
+
+  @override
+  String get batchSpin => 'Mehrfachdrehung';
+
+  @override
+  String batchSpinCount(int count) {
+    return '${count}x Drehung';
+  }
+
+  @override
+  String get batchDeleteRecords => 'Mehrfach löschen';
+
+  @override
+  String batchDeleteRecordsMsg(int count) {
+    return '$count ausgewählte Einträge löschen?';
+  }
+
+  @override
+  String get prizeSummary => 'Preisstatistik';
+
+  @override
+  String prizeCount(int count) {
+    return '${count}x';
+  }
+
+  @override
+  String prizePercent(String percent) {
+    return '$percent%';
+  }
+
+  @override
+  String get showAll => 'Alle anzeigen';
 }

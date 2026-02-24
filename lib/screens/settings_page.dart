@@ -175,7 +175,7 @@ class SettingsPage extends StatelessWidget {
               const SizedBox(height: 16),
               Text(l10n.appDescription, textAlign: TextAlign.center, style: theme.textTheme.bodyMedium),
               const SizedBox(height: 16),
-              Text('${l10n.developer}: FLLife', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.outline)),
+              Text('${l10n.developer}: 编程旧事', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.outline)),
               const SizedBox(height: 16),
             ],
           ),

@@ -339,4 +339,93 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get bgOverlayColor => 'Teinte superposée';
+
+  @override
+  String get pointerBottom => 'Bas';
+
+  @override
+  String get pointerLeft => 'Gauche';
+
+  @override
+  String get pointerStyle => 'Style du pointeur';
+
+  @override
+  String get pointerStyleClassic => 'Classique';
+
+  @override
+  String get pointerStyleArrow => 'Flèche';
+
+  @override
+  String get pointerStyleDiamond => 'Diamant';
+
+  @override
+  String get pointerStyleDot => 'Point';
+
+  @override
+  String get pointerStyleFlag => 'Drapeau';
+
+  @override
+  String get multiSpin => 'Multi-tirage';
+
+  @override
+  String get multiSpinTitle => 'Choisir le nombre';
+
+  @override
+  String multiSpinOption(int count) {
+    return 'Tourner $count fois';
+  }
+
+  @override
+  String multiSpinResult(int count) {
+    return 'Résultats ${count}x tirages';
+  }
+
+  @override
+  String get revealAll => 'Tout révéler';
+
+  @override
+  String get customSpinCount => 'Nombre personnalisé';
+
+  @override
+  String customSpinCountError(int min, int max) {
+    return 'Veuillez entrer un nombre entre $min et $max';
+  }
+
+  @override
+  String get skipSpinAnimation => 'Passer l\'animation';
+
+  @override
+  String get singleSpin => 'Tirage unique';
+
+  @override
+  String get batchSpin => 'Tirage groupé';
+
+  @override
+  String batchSpinCount(int count) {
+    return '${count}x tirage';
+  }
+
+  @override
+  String get batchDeleteRecords => 'Suppression groupée';
+
+  @override
+  String batchDeleteRecordsMsg(int count) {
+    return 'Supprimer les $count enregistrements sélectionnés ?';
+  }
+
+  @override
+  String get prizeSummary => 'Statistiques des prix';
+
+  @override
+  String prizeCount(int count) {
+    return '${count}x';
+  }
+
+  @override
+  String prizePercent(String percent) {
+    return '$percent%';
+  }
+
+  @override
+  String get showAll => 'Tout afficher';
 }

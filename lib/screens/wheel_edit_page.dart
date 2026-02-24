@@ -44,6 +44,7 @@ class _WheelEditPageState extends State<WheelEditPage> {
   late double _spinDuration;
   late SpinSpeed _spinSpeed;
   late PointerPosition _pointerPosition;
+  late PointerStyle _pointerStyle;
   late bool _showResult;
   late bool _enableSound;
   late bool _is3D;
@@ -71,6 +72,7 @@ class _WheelEditPageState extends State<WheelEditPage> {
     _spinDuration = w?.spinDuration ?? 5.0;
     _spinSpeed = w?.spinSpeed ?? SpinSpeed.normal;
     _pointerPosition = w?.pointerPosition ?? PointerPosition.top;
+    _pointerStyle = w?.pointerStyle ?? PointerStyle.classic;
     _showResult = w?.showResult ?? true;
     _enableSound = w?.enableSound ?? true;
     _is3D = w?.is3D ?? false;
@@ -210,7 +212,7 @@ class _WheelEditPageState extends State<WheelEditPage> {
             ),
             const SizedBox(height: 12),
 
-            // Pointer & Duration row
+            // Pointer position & style row
             Row(
               children: [
                 Expanded(child: _buildDropdown<PointerPosition>(
@@ -221,21 +223,29 @@ class _WheelEditPageState extends State<WheelEditPage> {
                   onChanged: (v) => setState(() => _pointerPosition = v!),
                 )),
                 const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('${l10n.spinDuration}: ${_spinDuration.toStringAsFixed(1)}s',
-                          style: theme.textTheme.bodySmall),
-                      Slider(
-                        value: _spinDuration,
-                        min: 2,
-                        max: 15,
-                        divisions: 26,
-                        onChanged: (v) => setState(() => _spinDuration = v),
-                      ),
-                    ],
-                  ),
+                Expanded(child: _buildDropdown<PointerStyle>(
+                  label: l10n.pointerStyle,
+                  value: _pointerStyle,
+                  items: PointerStyle.values,
+                  labelFn: (v) => _pointerStyleLabel(l10n, v),
+                  onChanged: (v) => setState(() => _pointerStyle = v!),
+                )),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Duration slider
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('${l10n.spinDuration}: ${_spinDuration.toStringAsFixed(1)}s',
+                    style: theme.textTheme.bodySmall),
+                Slider(
+                  value: _spinDuration,
+                  min: 2,
+                  max: 15,
+                  divisions: 26,
+                  onChanged: (v) => setState(() => _spinDuration = v),
                 ),
               ],
             ),
@@ -624,7 +634,7 @@ class _WheelEditPageState extends State<WheelEditPage> {
     }
   }
 
-  void _save() {
+  Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     if (_segments.length < 2) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -646,6 +656,7 @@ class _WheelEditPageState extends State<WheelEditPage> {
       spinDuration: _spinDuration,
       spinSpeed: _spinSpeed,
       pointerPosition: _pointerPosition,
+      pointerStyle: _pointerStyle,
       showResult: _showResult,
       enableSound: _enableSound,
       is3D: _is3D,
@@ -661,9 +672,9 @@ class _WheelEditPageState extends State<WheelEditPage> {
 
     final provider = context.read<WheelProvider>();
     if (_isEditing) {
-      provider.updateWheel(wheel);
+      await provider.updateWheel(wheel);
     } else {
-      provider.addWheel(wheel);
+      await provider.addWheel(wheel);
     }
 
     if (!mounted) return;
@@ -721,5 +732,15 @@ class _WheelEditPageState extends State<WheelEditPage> {
   String _pointerLabel(AppLocalizations l10n, PointerPosition p) => switch (p) {
     PointerPosition.top => l10n.pointerTop,
     PointerPosition.right => l10n.pointerRight,
+    PointerPosition.bottom => l10n.pointerBottom,
+    PointerPosition.left => l10n.pointerLeft,
+  };
+
+  String _pointerStyleLabel(AppLocalizations l10n, PointerStyle s) => switch (s) {
+    PointerStyle.classic => l10n.pointerStyleClassic,
+    PointerStyle.arrow => l10n.pointerStyleArrow,
+    PointerStyle.diamond => l10n.pointerStyleDiamond,
+    PointerStyle.dot => l10n.pointerStyleDot,
+    PointerStyle.flag => l10n.pointerStyleFlag,
   };
 }

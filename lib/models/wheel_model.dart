@@ -9,7 +9,9 @@ enum WheelForm { standard, petal, star, polygon }
 
 enum SpinSpeed { slow, normal, fast }
 
-enum PointerPosition { top, right }
+enum PointerPosition { top, right, bottom, left }
+
+enum PointerStyle { classic, arrow, diamond, dot, flag }
 
 class WheelSegment {
   String id;
@@ -54,6 +56,7 @@ class SpinRecord {
   String prizeName;
   int prizeColor;
   DateTime spinTime;
+  String? batchId; // non-null for batch spins, groups records together
 
   SpinRecord({
     required this.id,
@@ -62,6 +65,7 @@ class SpinRecord {
     required this.prizeName,
     required this.prizeColor,
     required this.spinTime,
+    this.batchId,
   });
 
   Map<String, dynamic> toMap() => {
@@ -71,6 +75,7 @@ class SpinRecord {
     'prizeName': prizeName,
     'prizeColor': prizeColor,
     'spinTime': spinTime.toIso8601String(),
+    'batchId': batchId,
   };
 
   factory SpinRecord.fromMap(Map<String, dynamic> map) => SpinRecord(
@@ -80,6 +85,7 @@ class SpinRecord {
     prizeName: map['prizeName'] as String,
     prizeColor: map['prizeColor'] as int,
     spinTime: DateTime.parse(map['spinTime'] as String),
+    batchId: map['batchId'] as String?,
   );
 }
 
@@ -92,6 +98,7 @@ class WheelModel {
   double spinDuration;
   SpinSpeed spinSpeed;
   PointerPosition pointerPosition;
+  PointerStyle pointerStyle;
   bool showResult;
   bool enableSound;
   bool is3D;
@@ -113,6 +120,7 @@ class WheelModel {
     this.spinDuration = 5.0,
     this.spinSpeed = SpinSpeed.normal,
     this.pointerPosition = PointerPosition.top,
+    this.pointerStyle = PointerStyle.classic,
     this.showResult = true,
     this.enableSound = true,
     this.is3D = false,
@@ -135,6 +143,7 @@ class WheelModel {
     'spinDuration': spinDuration,
     'spinSpeed': spinSpeed.index,
     'pointerPosition': pointerPosition.index,
+    'pointerStyle': pointerStyle.index,
     'showResult': showResult ? 1 : 0,
     'enableSound': enableSound ? 1 : 0,
     'is3D': is3D ? 1 : 0,
@@ -161,6 +170,7 @@ class WheelModel {
     spinDuration: (map['spinDuration'] as num).toDouble(),
     spinSpeed: _safeEnum(SpinSpeed.values, map['spinSpeed'] as int, SpinSpeed.normal),
     pointerPosition: _safeEnum(PointerPosition.values, map['pointerPosition'] as int, PointerPosition.top),
+    pointerStyle: _safeEnum(PointerStyle.values, (map['pointerStyle'] as int?) ?? 0, PointerStyle.classic),
     showResult: (map['showResult'] as int) == 1,
     enableSound: (map['enableSound'] as int) == 1,
     is3D: (map['is3D'] as int?) == 1,

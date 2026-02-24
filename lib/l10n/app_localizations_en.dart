@@ -339,4 +339,93 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bgOverlayColor => 'Overlay Tint';
+
+  @override
+  String get pointerBottom => 'Bottom';
+
+  @override
+  String get pointerLeft => 'Left';
+
+  @override
+  String get pointerStyle => 'Pointer Style';
+
+  @override
+  String get pointerStyleClassic => 'Classic';
+
+  @override
+  String get pointerStyleArrow => 'Arrow';
+
+  @override
+  String get pointerStyleDiamond => 'Diamond';
+
+  @override
+  String get pointerStyleDot => 'Dot';
+
+  @override
+  String get pointerStyleFlag => 'Flag';
+
+  @override
+  String get multiSpin => 'Multi-Spin';
+
+  @override
+  String get multiSpinTitle => 'Choose spin count';
+
+  @override
+  String multiSpinOption(int count) {
+    return 'Spin $count times';
+  }
+
+  @override
+  String multiSpinResult(int count) {
+    return '${count}x Spin Results';
+  }
+
+  @override
+  String get revealAll => 'Reveal All';
+
+  @override
+  String get customSpinCount => 'Custom count';
+
+  @override
+  String customSpinCountError(int min, int max) {
+    return 'Please enter a number between $min and $max';
+  }
+
+  @override
+  String get skipSpinAnimation => 'Skip spin animation';
+
+  @override
+  String get singleSpin => 'Single spin';
+
+  @override
+  String get batchSpin => 'Batch spin';
+
+  @override
+  String batchSpinCount(int count) {
+    return '${count}x batch';
+  }
+
+  @override
+  String get batchDeleteRecords => 'Batch Delete';
+
+  @override
+  String batchDeleteRecordsMsg(int count) {
+    return 'Delete $count selected records?';
+  }
+
+  @override
+  String get prizeSummary => 'Prize Summary';
+
+  @override
+  String prizeCount(int count) {
+    return '${count}x';
+  }
+
+  @override
+  String prizePercent(String percent) {
+    return '$percent%';
+  }
+
+  @override
+  String get showAll => 'Show All';
 }

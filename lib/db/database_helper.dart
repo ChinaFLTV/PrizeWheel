@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/wheel_model.dart';
@@ -19,7 +20,7 @@ class DatabaseHelper {
     final path = join(dbPath, 'prize_wheel.db');
     return openDatabase(
       path,
-      version: 4,
+      version: 6,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -36,6 +37,7 @@ class DatabaseHelper {
         spinDuration REAL NOT NULL DEFAULT 5.0,
         spinSpeed INTEGER NOT NULL DEFAULT 1,
         pointerPosition INTEGER NOT NULL DEFAULT 0,
+        pointerStyle INTEGER NOT NULL DEFAULT 0,
         showResult INTEGER NOT NULL DEFAULT 1,
         enableSound INTEGER NOT NULL DEFAULT 1,
         is3D INTEGER NOT NULL DEFAULT 0,
@@ -56,7 +58,8 @@ class DatabaseHelper {
         wheelTitle TEXT NOT NULL,
         prizeName TEXT NOT NULL,
         prizeColor INTEGER NOT NULL,
-        spinTime TEXT NOT NULL
+        spinTime TEXT NOT NULL,
+        batchId TEXT
       )
     ''');
   }
@@ -75,14 +78,28 @@ class DatabaseHelper {
       ''');
     }
     if (oldVersion < 3) {
-      await db.execute('ALTER TABLE wheels ADD COLUMN is3D INTEGER NOT NULL DEFAULT 0');
-      await db.execute('ALTER TABLE wheels ADD COLUMN backgroundImagePath TEXT');
+      await _addColumnIfNotExists(db, 'wheels', 'is3D', 'INTEGER NOT NULL DEFAULT 0');
+      await _addColumnIfNotExists(db, 'wheels', 'backgroundImagePath', 'TEXT');
     }
     if (oldVersion < 4) {
-      await db.execute('ALTER TABLE wheels ADD COLUMN bgBlurEnabled INTEGER NOT NULL DEFAULT 0');
-      await db.execute('ALTER TABLE wheels ADD COLUMN bgBlurIntensity REAL NOT NULL DEFAULT 10.0');
-      await db.execute('ALTER TABLE wheels ADD COLUMN bgOpacity REAL NOT NULL DEFAULT 1.0');
-      await db.execute('ALTER TABLE wheels ADD COLUMN bgOverlayColor INTEGER NOT NULL DEFAULT 0');
+      await _addColumnIfNotExists(db, 'wheels', 'bgBlurEnabled', 'INTEGER NOT NULL DEFAULT 0');
+      await _addColumnIfNotExists(db, 'wheels', 'bgBlurIntensity', 'REAL NOT NULL DEFAULT 10.0');
+      await _addColumnIfNotExists(db, 'wheels', 'bgOpacity', 'REAL NOT NULL DEFAULT 1.0');
+      await _addColumnIfNotExists(db, 'wheels', 'bgOverlayColor', 'INTEGER NOT NULL DEFAULT 0');
+    }
+    if (oldVersion < 5) {
+      await _addColumnIfNotExists(db, 'wheels', 'pointerStyle', 'INTEGER NOT NULL DEFAULT 0');
+    }
+    if (oldVersion < 6) {
+      await _addColumnIfNotExists(db, 'spin_records', 'batchId', 'TEXT');
+    }
+  }
+
+  Future<void> _addColumnIfNotExists(Database db, String table, String column, String type) async {
+    final cols = await db.rawQuery('PRAGMA table_info($table)');
+    final exists = cols.any((c) => c['name'] == column);
+    if (!exists) {
+      await db.execute('ALTER TABLE $table ADD COLUMN $column $type');
     }
   }
 
@@ -90,7 +107,15 @@ class DatabaseHelper {
   Future<List<WheelModel>> getAllWheels() async {
     final db = await database;
     final maps = await db.query('wheels', orderBy: 'createdAt DESC');
-    return maps.map((m) => WheelModel.fromMap(m)).toList();
+    final wheels = <WheelModel>[];
+    for (final m in maps) {
+      try {
+        wheels.add(WheelModel.fromMap(m));
+      } catch (e) {
+        debugPrint('Error parsing wheel: $e');
+      }
+    }
+    return wheels;
   }
 
   Future<void> insertWheel(WheelModel wheel) async {
@@ -133,8 +158,20 @@ class DatabaseHelper {
     await db.delete('spin_records', where: 'id = ?', whereArgs: [id]);
   }
 
+  Future<void> deleteSpinRecords(List<String> ids) async {
+    if (ids.isEmpty) return;
+    final db = await database;
+    final placeholders = ids.map((_) => '?').join(',');
+    await db.delete('spin_records', where: 'id IN ($placeholders)', whereArgs: ids);
+  }
+
   Future<void> deleteAllSpinRecords(String wheelId) async {
     final db = await database;
     await db.delete('spin_records', where: 'wheelId = ?', whereArgs: [wheelId]);
+  }
+
+  Future<void> deleteSpinRecordsByBatchId(String batchId) async {
+    final db = await database;
+    await db.delete('spin_records', where: 'batchId = ?', whereArgs: [batchId]);
   }
 }

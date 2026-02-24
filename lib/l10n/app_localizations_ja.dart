@@ -335,4 +335,93 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get bgOverlayColor => 'オーバーレイ色';
+
+  @override
+  String get pointerBottom => '下';
+
+  @override
+  String get pointerLeft => '左';
+
+  @override
+  String get pointerStyle => 'ポインタースタイル';
+
+  @override
+  String get pointerStyleClassic => 'クラシック';
+
+  @override
+  String get pointerStyleArrow => '矢印';
+
+  @override
+  String get pointerStyleDiamond => 'ダイヤモンド';
+
+  @override
+  String get pointerStyleDot => 'ドット';
+
+  @override
+  String get pointerStyleFlag => 'フラッグ';
+
+  @override
+  String get multiSpin => '連続抽選';
+
+  @override
+  String get multiSpinTitle => '抽選回数を選択';
+
+  @override
+  String multiSpinOption(int count) {
+    return '$count回連続抽選';
+  }
+
+  @override
+  String multiSpinResult(int count) {
+    return '$count連抽選結果';
+  }
+
+  @override
+  String get revealAll => 'すべて表示';
+
+  @override
+  String get customSpinCount => 'カスタム回数';
+
+  @override
+  String customSpinCountError(int min, int max) {
+    return '$min～$maxの数字を入力してください';
+  }
+
+  @override
+  String get skipSpinAnimation => '抽選アニメをスキップ';
+
+  @override
+  String get singleSpin => '単発抽選';
+
+  @override
+  String get batchSpin => '連続抽選';
+
+  @override
+  String batchSpinCount(int count) {
+    return '$count連抽選';
+  }
+
+  @override
+  String get batchDeleteRecords => '一括削除';
+
+  @override
+  String batchDeleteRecordsMsg(int count) {
+    return '選択した$count件の記録を削除しますか？';
+  }
+
+  @override
+  String get prizeSummary => '賞品統計';
+
+  @override
+  String prizeCount(int count) {
+    return '$count回';
+  }
+
+  @override
+  String prizePercent(String percent) {
+    return '$percent%';
+  }
+
+  @override
+  String get showAll => 'すべて表示';
 }

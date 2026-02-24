@@ -740,6 +740,156 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'叠加色调'**
   String get bgOverlayColor;
+
+  /// No description provided for @pointerBottom.
+  ///
+  /// In zh, this message translates to:
+  /// **'底部'**
+  String get pointerBottom;
+
+  /// No description provided for @pointerLeft.
+  ///
+  /// In zh, this message translates to:
+  /// **'左侧'**
+  String get pointerLeft;
+
+  /// No description provided for @pointerStyle.
+  ///
+  /// In zh, this message translates to:
+  /// **'指针风格'**
+  String get pointerStyle;
+
+  /// No description provided for @pointerStyleClassic.
+  ///
+  /// In zh, this message translates to:
+  /// **'经典'**
+  String get pointerStyleClassic;
+
+  /// No description provided for @pointerStyleArrow.
+  ///
+  /// In zh, this message translates to:
+  /// **'箭头'**
+  String get pointerStyleArrow;
+
+  /// No description provided for @pointerStyleDiamond.
+  ///
+  /// In zh, this message translates to:
+  /// **'钻石'**
+  String get pointerStyleDiamond;
+
+  /// No description provided for @pointerStyleDot.
+  ///
+  /// In zh, this message translates to:
+  /// **'圆点'**
+  String get pointerStyleDot;
+
+  /// No description provided for @pointerStyleFlag.
+  ///
+  /// In zh, this message translates to:
+  /// **'旗帜'**
+  String get pointerStyleFlag;
+
+  /// No description provided for @multiSpin.
+  ///
+  /// In zh, this message translates to:
+  /// **'连抽'**
+  String get multiSpin;
+
+  /// No description provided for @multiSpinTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择连抽次数'**
+  String get multiSpinTitle;
+
+  /// No description provided for @multiSpinOption.
+  ///
+  /// In zh, this message translates to:
+  /// **'连续抽奖 {count} 次'**
+  String multiSpinOption(int count);
+
+  /// No description provided for @multiSpinResult.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count} 连抽结果'**
+  String multiSpinResult(int count);
+
+  /// No description provided for @revealAll.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部揭晓'**
+  String get revealAll;
+
+  /// No description provided for @customSpinCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'自定义次数'**
+  String get customSpinCount;
+
+  /// No description provided for @customSpinCountError.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入 {min} ~ {max} 之间的数字'**
+  String customSpinCountError(int min, int max);
+
+  /// No description provided for @skipSpinAnimation.
+  ///
+  /// In zh, this message translates to:
+  /// **'跳过抽奖过程'**
+  String get skipSpinAnimation;
+
+  /// No description provided for @singleSpin.
+  ///
+  /// In zh, this message translates to:
+  /// **'单次抽奖'**
+  String get singleSpin;
+
+  /// No description provided for @batchSpin.
+  ///
+  /// In zh, this message translates to:
+  /// **'批量抽奖'**
+  String get batchSpin;
+
+  /// No description provided for @batchSpinCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count} 连抽'**
+  String batchSpinCount(int count);
+
+  /// No description provided for @batchDeleteRecords.
+  ///
+  /// In zh, this message translates to:
+  /// **'批量删除'**
+  String get batchDeleteRecords;
+
+  /// No description provided for @batchDeleteRecordsMsg.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要删除选中的 {count} 条记录吗？'**
+  String batchDeleteRecordsMsg(int count);
+
+  /// No description provided for @prizeSummary.
+  ///
+  /// In zh, this message translates to:
+  /// **'奖品统计'**
+  String get prizeSummary;
+
+  /// No description provided for @prizeCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count} 次'**
+  String prizeCount(int count);
+
+  /// No description provided for @prizePercent.
+  ///
+  /// In zh, this message translates to:
+  /// **'{percent}%'**
+  String prizePercent(String percent);
+
+  /// No description provided for @showAll.
+  ///
+  /// In zh, this message translates to:
+  /// **'显示全部'**
+  String get showAll;
 }
 
 class _AppLocalizationsDelegate

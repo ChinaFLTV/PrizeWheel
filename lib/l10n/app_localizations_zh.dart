@@ -335,6 +335,95 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get bgOverlayColor => '叠加色调';
+
+  @override
+  String get pointerBottom => '底部';
+
+  @override
+  String get pointerLeft => '左侧';
+
+  @override
+  String get pointerStyle => '指针风格';
+
+  @override
+  String get pointerStyleClassic => '经典';
+
+  @override
+  String get pointerStyleArrow => '箭头';
+
+  @override
+  String get pointerStyleDiamond => '钻石';
+
+  @override
+  String get pointerStyleDot => '圆点';
+
+  @override
+  String get pointerStyleFlag => '旗帜';
+
+  @override
+  String get multiSpin => '连抽';
+
+  @override
+  String get multiSpinTitle => '选择连抽次数';
+
+  @override
+  String multiSpinOption(int count) {
+    return '连续抽奖 $count 次';
+  }
+
+  @override
+  String multiSpinResult(int count) {
+    return '$count 连抽结果';
+  }
+
+  @override
+  String get revealAll => '全部揭晓';
+
+  @override
+  String get customSpinCount => '自定义次数';
+
+  @override
+  String customSpinCountError(int min, int max) {
+    return '请输入 $min ~ $max 之间的数字';
+  }
+
+  @override
+  String get skipSpinAnimation => '跳过抽奖过程';
+
+  @override
+  String get singleSpin => '单次抽奖';
+
+  @override
+  String get batchSpin => '批量抽奖';
+
+  @override
+  String batchSpinCount(int count) {
+    return '$count 连抽';
+  }
+
+  @override
+  String get batchDeleteRecords => '批量删除';
+
+  @override
+  String batchDeleteRecordsMsg(int count) {
+    return '确定要删除选中的 $count 条记录吗？';
+  }
+
+  @override
+  String get prizeSummary => '奖品统计';
+
+  @override
+  String prizeCount(int count) {
+    return '$count 次';
+  }
+
+  @override
+  String prizePercent(String percent) {
+    return '$percent%';
+  }
+
+  @override
+  String get showAll => '显示全部';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -668,4 +757,93 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get bgOverlayColor => '疊加色調';
+
+  @override
+  String get pointerBottom => '底部';
+
+  @override
+  String get pointerLeft => '左側';
+
+  @override
+  String get pointerStyle => '指針風格';
+
+  @override
+  String get pointerStyleClassic => '經典';
+
+  @override
+  String get pointerStyleArrow => '箭頭';
+
+  @override
+  String get pointerStyleDiamond => '鑽石';
+
+  @override
+  String get pointerStyleDot => '圓點';
+
+  @override
+  String get pointerStyleFlag => '旗幟';
+
+  @override
+  String get multiSpin => '連抽';
+
+  @override
+  String get multiSpinTitle => '選擇連抽次數';
+
+  @override
+  String multiSpinOption(int count) {
+    return '連續抽獎 $count 次';
+  }
+
+  @override
+  String multiSpinResult(int count) {
+    return '$count 連抽結果';
+  }
+
+  @override
+  String get revealAll => '全部揭曉';
+
+  @override
+  String get customSpinCount => '自定義次數';
+
+  @override
+  String customSpinCountError(int min, int max) {
+    return '請輸入 $min ~ $max 之間的數字';
+  }
+
+  @override
+  String get skipSpinAnimation => '跳過抽獎過程';
+
+  @override
+  String get singleSpin => '單次抽獎';
+
+  @override
+  String get batchSpin => '批量抽獎';
+
+  @override
+  String batchSpinCount(int count) {
+    return '$count 連抽';
+  }
+
+  @override
+  String get batchDeleteRecords => '批量刪除';
+
+  @override
+  String batchDeleteRecordsMsg(int count) {
+    return '確定要刪除選中的 $count 條記錄嗎？';
+  }
+
+  @override
+  String get prizeSummary => '獎品統計';
+
+  @override
+  String prizeCount(int count) {
+    return '$count 次';
+  }
+
+  @override
+  String prizePercent(String percent) {
+    return '$percent%';
+  }
+
+  @override
+  String get showAll => '顯示全部';
 }
