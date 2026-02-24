@@ -8,3 +8,6 @@
 
 # Keep annotations
 -keepattributes *Annotation*
+
+# Ignore missing Play Core classes referenced by Flutter engine (deferred components)
+-dontwarn com.google.android.play.core.**
