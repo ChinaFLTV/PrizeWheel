@@ -1,25 +1,39 @@
-<div style="text-align: center;">
+---
 
-<img src="https://img.icons8.com/color/128/prize-wheel.png" alt="PrizeWheel Logo" width="128" height="128">
+<p align="center">
+  <img src="https://raw.githubusercontent.com/ChinaFLTV/PrizeWheel/main/docs/logo/prize_wheel.png" alt="PrizeWheel Logo" width="128" height="128">
+</p>
 
-# 🎰 PrizeWheel
+<h1 align="center">🎰 PrizeWheel</h1>
 
-A beautiful, fully customizable prize wheel app with rich styles, probability control, multi-spin mode, and complete spin history.
+<p align="center">
+  A beautiful, fully customizable prize wheel app with rich styles, probability control, multi-spin mode, and complete spin history.
+</p>
 
-Your pocket lucky wheel 🎡
+<p align="center">
+  Your pocket lucky wheel 🎡
+</p>
 
-Whether it's party games, classroom picks, or everyday decisions, PrizeWheel makes randomness fun.<br>
-Runs entirely on-device. No data uploaded. Your privacy is safe.
+<p align="center">
+  Whether it's party games, classroom picks, or everyday decisions, PrizeWheel makes randomness fun.<br>
+  Runs entirely on-device. No data uploaded. Your privacy is safe.
+</p>
 
-[简体中文](README.md) · English
+<p align="center">
+  <a href="README.md">简体中文</a> · English
+</p>
 
-[![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-brightgreen?style=flat-square&logo=flutter)](.)
-[![Flutter](https://img.shields.io/badge/Flutter-3.16+-blue?style=flat-square&logo=flutter)](.)
-[![Dart](https://img.shields.io/badge/Dart-3.11+-blue?style=flat-square&logo=dart)](.)
-[![License](https://img.shields.io/badge/License-MIT-blueviolet?style=flat-square)](.)
-[![Material Design 3](https://img.shields.io/badge/Material%20Design%203-enabled-purple?style=flat-square&logo=materialdesign)](.)
-
-</div>
+<p align="center">
+  <a href="https://github.com/ChinaFLTV/PrizeWheel/releases"><img src="https://img.shields.io/github/v/release/ChinaFLTV/PrizeWheel?style=flat-square&logo=github&label=Release" alt="Release"></a>
+  <a href="https://github.com/ChinaFLTV/PrizeWheel/stargazers"><img src="https://img.shields.io/github/stars/ChinaFLTV/PrizeWheel?style=flat-square&logo=github" alt="Stars"></a>
+  <a href="https://github.com/ChinaFLTV/PrizeWheel/network/members"><img src="https://img.shields.io/github/forks/ChinaFLTV/PrizeWheel?style=flat-square&logo=github" alt="Forks"></a>
+  <a href="https://github.com/ChinaFLTV/PrizeWheel/issues"><img src="https://img.shields.io/github/issues/ChinaFLTV/PrizeWheel?style=flat-square" alt="Issues"></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blueviolet?style=flat-square" alt="License"></a>
+  <img src="https://img.shields.io/badge/Platform-Android%20%7C%20iOS-brightgreen?style=flat-square&logo=flutter" alt="Platform">
+  <img src="https://img.shields.io/badge/Flutter-3.16+-blue?style=flat-square&logo=flutter" alt="Flutter">
+  <img src="https://img.shields.io/badge/Dart-3.11+-blue?style=flat-square&logo=dart" alt="Dart">
+  <img src="https://img.shields.io/badge/Material%20Design%203-enabled-purple?style=flat-square&logo=materialdesign" alt="Material Design 3">
+</p>
 
 ---
 
@@ -28,8 +42,10 @@ Runs entirely on-device. No data uploaded. Your privacy is safe.
 
 - [Why PrizeWheel?](#why-prizewheel)
 - [Features](#features)
+- [Screenshots](#screenshots)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
   - [Build from Source](#build-from-source)
 - [Architecture](#architecture)
 - [Internationalization](#internationalization)
@@ -65,6 +81,13 @@ Define your own prizes, probabilities, colors, wheel styles, and even pointer de
 | 🎨 Material Design 3     | Clean, modern UI with light/dark/system theme modes                                               |
 | 💾 Local Persistence     | All data stored in local SQLite database — no network required, fully private                     |
 
+## Screenshots
+
+|                                                                                                                |                                                                                                                |                                                                                                                |
+|:--------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------:|
+| ![Screenshot 1](https://raw.githubusercontent.com/ChinaFLTV/PrizeWheel/main/docs/screenshots/screenshot-1.jpg) | ![Screenshot 2](https://raw.githubusercontent.com/ChinaFLTV/PrizeWheel/main/docs/screenshots/screenshot-2.jpg) | ![Screenshot 3](https://raw.githubusercontent.com/ChinaFLTV/PrizeWheel/main/docs/screenshots/screenshot-3.jpg) |
+| ![Screenshot 4](https://raw.githubusercontent.com/ChinaFLTV/PrizeWheel/main/docs/screenshots/screenshot-4.jpg) | ![Screenshot 5](https://raw.githubusercontent.com/ChinaFLTV/PrizeWheel/main/docs/screenshots/screenshot-5.jpg) | ![Screenshot 6](https://raw.githubusercontent.com/ChinaFLTV/PrizeWheel/main/docs/screenshots/screenshot-6.jpg) |
+
 ## Getting Started
 
 ### Prerequisites
@@ -75,12 +98,16 @@ Define your own prizes, probabilities, colors, wheel styles, and even pointer de
 | Dart        | ≥ 3.11.0               |
 | Android SDK | API 21+ (Android 5.0+) |
 
+### Installation
+
+Download the latest APK from the [Releases](https://github.com/ChinaFLTV/PrizeWheel/releases) page and install it on your Android device.
+
 ### Build from Source
 
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/your-username/PrizeWheel.git
+    git clone https://github.com/ChinaFLTV/PrizeWheel.git
     cd PrizeWheel
     ```
 
@@ -192,8 +219,4 @@ PrizeWheel is built on these great open-source projects:
 
 ---
 
-<div style="text-align: center;">
-
-Made with ❤️ for fun randomness
-
-</div>
+*Made with ❤️ for fun randomness*

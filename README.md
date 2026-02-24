@@ -1,25 +1,39 @@
-<div style="text-align: center;">
+---
 
-<img src="https://img.icons8.com/color/128/prize-wheel.png" alt="PrizeWheel Logo" width="128" height="128">
+<p align="center">
+  <img src="https://raw.githubusercontent.com/ChinaFLTV/PrizeWheel/main/docs/logo/prize_wheel.png" alt="PrizeWheel Logo" width="128" height="128">
+</p>
 
-# 🎰 PrizeWheel 抽奖转盘
+<h1 align="center">🎰 PrizeWheel 抽奖转盘</h1>
 
-一款精美的自定义抽奖转盘应用，支持丰富的转盘样式、概率控制、连抽模式和完整的抽奖记录。
+<p align="center">
+  一款精美的自定义抽奖转盘应用，支持丰富的转盘样式、概率控制、连抽模式和完整的抽奖记录。
+</p>
 
-你的口袋里的幸运转盘 🎡
+<p align="center">
+  你的口袋里的幸运转盘 🎡
+</p>
 
-无论是聚会游戏、课堂点名还是日常决策，PrizeWheel 都能让随机变得有趣。<br>
-完全本地运行，数据不上传，隐私有保障。
+<p align="center">
+  无论是聚会游戏、课堂点名还是日常决策，PrizeWheel 都能让随机变得有趣。<br>
+  完全本地运行，数据不上传，隐私有保障。
+</p>
 
-简体中文 · [English](README_EN.md)
+<p align="center">
+  简体中文 · <a href="README_EN.md">English</a>
+</p>
 
-[![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-brightgreen?style=flat-square&logo=flutter)](.)
-[![Flutter](https://img.shields.io/badge/Flutter-3.16+-blue?style=flat-square&logo=flutter)](.)
-[![Dart](https://img.shields.io/badge/Dart-3.11+-blue?style=flat-square&logo=dart)](.)
-[![License](https://img.shields.io/badge/License-MIT-blueviolet?style=flat-square)](.)
-[![Material Design 3](https://img.shields.io/badge/Material%20Design%203-enabled-purple?style=flat-square&logo=materialdesign)](.)
-
-</div>
+<p align="center">
+  <a href="https://github.com/ChinaFLTV/PrizeWheel/releases"><img src="https://img.shields.io/github/v/release/ChinaFLTV/PrizeWheel?style=flat-square&logo=github&label=Release" alt="Release"></a>
+  <a href="https://github.com/ChinaFLTV/PrizeWheel/stargazers"><img src="https://img.shields.io/github/stars/ChinaFLTV/PrizeWheel?style=flat-square&logo=github" alt="Stars"></a>
+  <a href="https://github.com/ChinaFLTV/PrizeWheel/network/members"><img src="https://img.shields.io/github/forks/ChinaFLTV/PrizeWheel?style=flat-square&logo=github" alt="Forks"></a>
+  <a href="https://github.com/ChinaFLTV/PrizeWheel/issues"><img src="https://img.shields.io/github/issues/ChinaFLTV/PrizeWheel?style=flat-square" alt="Issues"></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blueviolet?style=flat-square" alt="License"></a>
+  <img src="https://img.shields.io/badge/Platform-Android%20%7C%20iOS-brightgreen?style=flat-square&logo=flutter" alt="Platform">
+  <img src="https://img.shields.io/badge/Flutter-3.16+-blue?style=flat-square&logo=flutter" alt="Flutter">
+  <img src="https://img.shields.io/badge/Dart-3.11+-blue?style=flat-square&logo=dart" alt="Dart">
+  <img src="https://img.shields.io/badge/Material%20Design%203-enabled-purple?style=flat-square&logo=materialdesign" alt="Material Design 3">
+</p>
 
 ---
 
@@ -28,8 +42,10 @@
 
 - [为什么选择 PrizeWheel？](#为什么选择-prizewheel)
 - [功能特性](#功能特性)
+- [截图预览](#截图预览)
 - [快速开始](#快速开始)
   - [环境要求](#环境要求)
+  - [安装](#安装)
   - [从源码构建](#从源码构建)
 - [项目结构](#项目结构)
 - [国际化](#国际化)
@@ -65,6 +81,13 @@
 | 🎨 Material Design 3 | 简洁现代的 UI，支持亮色/暗色/跟随系统主题切换                  |
 | 💾 本地持久化             | 所有数据存储在本地 SQLite 数据库，无需网络，隐私安全             |
 
+## 截图预览
+
+|                                                                                                       |                                                                                                       |                                                                                                       |
+|:-----------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------:|
+| ![截图1](https://raw.githubusercontent.com/ChinaFLTV/PrizeWheel/main/docs/screenshots/screenshot-1.jpg) | ![截图2](https://raw.githubusercontent.com/ChinaFLTV/PrizeWheel/main/docs/screenshots/screenshot-2.jpg) | ![截图3](https://raw.githubusercontent.com/ChinaFLTV/PrizeWheel/main/docs/screenshots/screenshot-3.jpg) |
+| ![截图4](https://raw.githubusercontent.com/ChinaFLTV/PrizeWheel/main/docs/screenshots/screenshot-4.jpg) | ![截图5](https://raw.githubusercontent.com/ChinaFLTV/PrizeWheel/main/docs/screenshots/screenshot-5.jpg) | ![截图6](https://raw.githubusercontent.com/ChinaFLTV/PrizeWheel/main/docs/screenshots/screenshot-6.jpg) |
+
 ## 快速开始
 
 ### 环境要求
@@ -75,12 +98,16 @@
 | Dart        | ≥ 3.11.0              |
 | Android SDK | API 21+（Android 5.0+） |
 
+### 安装
+
+从 [Releases](https://github.com/ChinaFLTV/PrizeWheel/releases) 页面下载最新 APK，安装到 Android 设备即可。
+
 ### 从源码构建
 
 1. 克隆仓库：
 
     ```bash
-    git clone https://github.com/your-username/PrizeWheel.git
+    git clone https://github.com/ChinaFLTV/PrizeWheel.git
     cd PrizeWheel
     ```
 
@@ -192,8 +219,4 @@ PrizeWheel 基于以下优秀的开源项目构建：
 
 ---
 
-<div style="text-align: center;">
-
-用 ❤️ 打造的抽奖转盘
-
-</div>
+*用 ❤️ 打造的抽奖转盘*
