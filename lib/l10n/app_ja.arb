@@ -102,5 +102,9 @@
   "styleMetallic": "メタリック",
   "stylePastel": "パステル",
   "styleDark": "ダーク",
-  "styleRainbow": "レインボー"
+  "styleRainbow": "レインボー",
+  "bgBlur": "ガウスぼかし",
+  "bgBlurIntensity": "ぼかし強度",
+  "bgOpacity": "背景の不透明度",
+  "bgOverlayColor": "オーバーレイ色"
 }

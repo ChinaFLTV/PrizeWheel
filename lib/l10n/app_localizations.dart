@@ -716,6 +716,30 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'彩虹'**
   String get styleRainbow;
+
+  /// No description provided for @bgBlur.
+  ///
+  /// In zh, this message translates to:
+  /// **'高斯模糊'**
+  String get bgBlur;
+
+  /// No description provided for @bgBlurIntensity.
+  ///
+  /// In zh, this message translates to:
+  /// **'模糊强度'**
+  String get bgBlurIntensity;
+
+  /// No description provided for @bgOpacity.
+  ///
+  /// In zh, this message translates to:
+  /// **'背景透明度'**
+  String get bgOpacity;
+
+  /// No description provided for @bgOverlayColor.
+  ///
+  /// In zh, this message translates to:
+  /// **'叠加色调'**
+  String get bgOverlayColor;
 }
 
 class _AppLocalizationsDelegate

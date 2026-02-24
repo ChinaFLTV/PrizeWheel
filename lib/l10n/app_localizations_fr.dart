@@ -327,4 +327,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get styleRainbow => 'Arc-en-ciel';
+
+  @override
+  String get bgBlur => 'Flou gaussien';
+
+  @override
+  String get bgBlurIntensity => 'Intensité du flou';
+
+  @override
+  String get bgOpacity => 'Opacité du fond';
+
+  @override
+  String get bgOverlayColor => 'Teinte superposée';
 }

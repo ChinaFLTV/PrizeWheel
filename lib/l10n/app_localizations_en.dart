@@ -327,4 +327,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get styleRainbow => 'Rainbow';
+
+  @override
+  String get bgBlur => 'Gaussian Blur';
+
+  @override
+  String get bgBlurIntensity => 'Blur Intensity';
+
+  @override
+  String get bgOpacity => 'Background Opacity';
+
+  @override
+  String get bgOverlayColor => 'Overlay Tint';
 }

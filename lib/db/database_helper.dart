@@ -19,7 +19,7 @@ class DatabaseHelper {
     final path = join(dbPath, 'prize_wheel.db');
     return openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -40,6 +40,10 @@ class DatabaseHelper {
         enableSound INTEGER NOT NULL DEFAULT 1,
         is3D INTEGER NOT NULL DEFAULT 0,
         backgroundImagePath TEXT,
+        bgBlurEnabled INTEGER NOT NULL DEFAULT 0,
+        bgBlurIntensity REAL NOT NULL DEFAULT 10.0,
+        bgOpacity REAL NOT NULL DEFAULT 1.0,
+        bgOverlayColor INTEGER NOT NULL DEFAULT 0,
         segments TEXT NOT NULL,
         createdAt TEXT NOT NULL,
         updatedAt TEXT NOT NULL
@@ -73,6 +77,12 @@ class DatabaseHelper {
     if (oldVersion < 3) {
       await db.execute('ALTER TABLE wheels ADD COLUMN is3D INTEGER NOT NULL DEFAULT 0');
       await db.execute('ALTER TABLE wheels ADD COLUMN backgroundImagePath TEXT');
+    }
+    if (oldVersion < 4) {
+      await db.execute('ALTER TABLE wheels ADD COLUMN bgBlurEnabled INTEGER NOT NULL DEFAULT 0');
+      await db.execute('ALTER TABLE wheels ADD COLUMN bgBlurIntensity REAL NOT NULL DEFAULT 10.0');
+      await db.execute('ALTER TABLE wheels ADD COLUMN bgOpacity REAL NOT NULL DEFAULT 1.0');
+      await db.execute('ALTER TABLE wheels ADD COLUMN bgOverlayColor INTEGER NOT NULL DEFAULT 0');
     }
   }
 

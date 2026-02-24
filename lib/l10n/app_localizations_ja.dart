@@ -323,4 +323,16 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get styleRainbow => 'レインボー';
+
+  @override
+  String get bgBlur => 'ガウスぼかし';
+
+  @override
+  String get bgBlurIntensity => 'ぼかし強度';
+
+  @override
+  String get bgOpacity => '背景の不透明度';
+
+  @override
+  String get bgOverlayColor => 'オーバーレイ色';
 }

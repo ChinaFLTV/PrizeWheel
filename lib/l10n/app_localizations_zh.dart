@@ -323,6 +323,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get styleRainbow => '彩虹';
+
+  @override
+  String get bgBlur => '高斯模糊';
+
+  @override
+  String get bgBlurIntensity => '模糊强度';
+
+  @override
+  String get bgOpacity => '背景透明度';
+
+  @override
+  String get bgOverlayColor => '叠加色调';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -644,4 +656,16 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get styleRainbow => '彩虹';
+
+  @override
+  String get bgBlur => '高斯模糊';
+
+  @override
+  String get bgBlurIntensity => '模糊強度';
+
+  @override
+  String get bgOpacity => '背景透明度';
+
+  @override
+  String get bgOverlayColor => '疊加色調';
 }

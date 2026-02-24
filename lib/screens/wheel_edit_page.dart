@@ -18,6 +18,15 @@ const _defaultColors = [
   Color(0xFF00897B), Color(0xFFD81B60), Color(0xFF7CB342),
 ];
 
+const _overlayPresets = [
+  Color(0x00000000), // none (transparent)
+  Color(0x30000000), // dark
+  Color(0x20FFFFFF), // light
+  Color(0x251A237E), // deep blue
+  Color(0x254E342E), // warm brown
+  Color(0x25880E4F), // magenta
+];
+
 class WheelEditPage extends StatefulWidget {
   final WheelModel? wheel;
   const WheelEditPage({super.key, this.wheel});
@@ -39,6 +48,10 @@ class _WheelEditPageState extends State<WheelEditPage> {
   late bool _enableSound;
   late bool _is3D;
   late String? _backgroundImagePath;
+  late bool _bgBlurEnabled;
+  late double _bgBlurIntensity;
+  late double _bgOpacity;
+  late int _bgOverlayColor;
   late List<WheelSegment> _segments;
 
   // Controllers for probability and ratio fields, keyed by segment id
@@ -62,6 +75,10 @@ class _WheelEditPageState extends State<WheelEditPage> {
     _enableSound = w?.enableSound ?? true;
     _is3D = w?.is3D ?? false;
     _backgroundImagePath = w?.backgroundImagePath;
+    _bgBlurEnabled = w?.bgBlurEnabled ?? false;
+    _bgBlurIntensity = w?.bgBlurIntensity ?? 10.0;
+    _bgOpacity = w?.bgOpacity ?? 1.0;
+    _bgOverlayColor = w?.bgOverlayColor ?? 0x00000000;
     _segments = w?.segments.map((s) => WheelSegment(
       id: s.id, label: s.label, probability: s.probability,
       color: s.color, ratio: s.ratio, iconName: s.iconName,
@@ -261,6 +278,81 @@ class _WheelEditPageState extends State<WheelEditPage> {
                 ],
               ),
             ),
+
+            // Background texture settings (only visible when image is set)
+            if (_backgroundImagePath != null) ...[
+              const SizedBox(height: 4),
+              Card(
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Gaussian blur toggle + intensity
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(l10n.bgBlur),
+                        secondary: const Icon(Icons.blur_on_rounded),
+                        value: _bgBlurEnabled,
+                        onChanged: (v) => setState(() => _bgBlurEnabled = v),
+                      ),
+                      if (_bgBlurEnabled) ...[
+                        Text('${l10n.bgBlurIntensity}: ${_bgBlurIntensity.toStringAsFixed(0)}',
+                            style: theme.textTheme.bodySmall),
+                        Slider(
+                          value: _bgBlurIntensity,
+                          min: 1,
+                          max: 30,
+                          divisions: 29,
+                          onChanged: (v) => setState(() => _bgBlurIntensity = v),
+                        ),
+                      ],
+                      const Divider(height: 8),
+                      // Opacity
+                      Text('${l10n.bgOpacity}: ${(_bgOpacity * 100).toStringAsFixed(0)}%',
+                          style: theme.textTheme.bodySmall),
+                      Slider(
+                        value: _bgOpacity,
+                        min: 0.1,
+                        max: 1.0,
+                        divisions: 18,
+                        onChanged: (v) => setState(() => _bgOpacity = v),
+                      ),
+                      const Divider(height: 8),
+                      // Overlay color
+                      Row(
+                        children: [
+                          Text(l10n.bgOverlayColor, style: theme.textTheme.bodySmall),
+                          const Spacer(),
+                          ..._overlayPresets.map((preset) => Padding(
+                            padding: const EdgeInsets.only(left: 6),
+                            child: GestureDetector(
+                              onTap: () => setState(() => _bgOverlayColor = preset.toARGB32()),
+                              child: Container(
+                                width: 28,
+                                height: 28,
+                                decoration: BoxDecoration(
+                                  color: preset,
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(
+                                    color: _bgOverlayColor == preset.toARGB32()
+                                        ? theme.colorScheme.primary
+                                        : theme.colorScheme.outline.withAlpha(60),
+                                    width: _bgOverlayColor == preset.toARGB32() ? 2.5 : 1,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                  ),
+                ),
+              ),
+            ],
 
             const Divider(height: 32),
 
@@ -527,6 +619,10 @@ class _WheelEditPageState extends State<WheelEditPage> {
       enableSound: _enableSound,
       is3D: _is3D,
       backgroundImagePath: _backgroundImagePath,
+      bgBlurEnabled: _bgBlurEnabled,
+      bgBlurIntensity: _bgBlurIntensity,
+      bgOpacity: _bgOpacity,
+      bgOverlayColor: _bgOverlayColor,
       segments: _segments,
       createdAt: widget.wheel?.createdAt ?? now,
       updatedAt: now,

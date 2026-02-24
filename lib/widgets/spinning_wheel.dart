@@ -26,9 +26,16 @@ class SpinningWheelState extends State<SpinningWheel>
   double _currentRotation = 0;
   bool _isSpinning = false;
 
+  // Idle breathing / glow animation
+  late AnimationController _glowController;
+
+  // Bounce on stop
+  late AnimationController _bounceController;
+  double _bounceScale = 1.0;
+
   // 3D tilt state
-  double _tiltX = 0; // rotation around X axis (vertical drag)
-  double _tiltY = 0; // rotation around Y axis (horizontal drag)
+  double _tiltX = 0;
+  double _tiltY = 0;
   AnimationController? _tiltResetController;
   double _tiltXStart = 0;
   double _tiltYStart = 0;
@@ -43,6 +50,18 @@ class SpinningWheelState extends State<SpinningWheel>
       vsync: this,
       duration: Duration(milliseconds: (widget.wheel.spinDuration * 1000).toInt()),
     );
+
+    _glowController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat();
+
+    _bounceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _bounceController.addListener(_onBounce);
+
     if (widget.wheel.is3D) {
       _tiltResetController = AnimationController(
         vsync: this,
@@ -56,8 +75,18 @@ class SpinningWheelState extends State<SpinningWheel>
     _tiltResetController?.removeListener(_animateTiltReset);
     _curvedAnimation?.dispose();
     _spinController.dispose();
+    _glowController.dispose();
+    _bounceController.removeListener(_onBounce);
+    _bounceController.dispose();
     _tiltResetController?.dispose();
     super.dispose();
+  }
+
+  void _onBounce() {
+    if (!mounted) return;
+    final t = _bounceController.value;
+    final bounce = 1.0 + 0.06 * sin(t * pi) * (1 - t);
+    setState(() => _bounceScale = bounce);
   }
 
   void _onPanUpdate(DragUpdateDetails details) {
@@ -89,7 +118,6 @@ class SpinningWheelState extends State<SpinningWheel>
 
   void spin() {
     if (_isSpinning || widget.wheel.segments.length < 2) return;
-
     setState(() => _isSpinning = true);
 
     final random = Random();
@@ -108,7 +136,6 @@ class SpinningWheelState extends State<SpinningWheel>
     }
     winnerCenterAngle += (winner.ratio / totalRatio) * pi;
 
-    // Adjust for pointer position: right pointer is 90° offset from top
     if (widget.wheel.pointerPosition == PointerPosition.right) {
       winnerCenterAngle -= pi / 2;
     }
@@ -125,7 +152,6 @@ class SpinningWheelState extends State<SpinningWheel>
 
     final fullRotations = speedMultiplier * 2 * pi;
     final targetRotation = _currentRotation + fullRotations + (2 * pi - ((_currentRotation + winnerCenterAngle) % (2 * pi)));
-
     final startRotation = _currentRotation;
 
     _spinController.duration = Duration(
@@ -153,26 +179,19 @@ class SpinningWheelState extends State<SpinningWheel>
       _curvedAnimation?.removeListener(onSpinTick);
       if (!mounted) return;
       setState(() => _isSpinning = false);
+      _bounceController.reset();
+      _bounceController.forward();
       widget.onResult?.call(winner);
     });
   }
 
   WheelSegment _selectWinner(Random random) {
     final segments = widget.wheel.segments;
-    if (segments.isEmpty) return segments.first; // should never happen
-
-    // Collect segments with probability > 0
+    if (segments.isEmpty) return segments.first;
     final candidates = segments.where((s) => s.probability > 0).toList();
-
-    // If no probabilities set, pick uniformly at random
-    if (candidates.isEmpty) {
-      return segments[random.nextInt(segments.length)];
-    }
-
-    // Weighted random selection among candidates
+    if (candidates.isEmpty) return segments[random.nextInt(segments.length)];
     final totalProb = candidates.fold<double>(0, (s, seg) => s + seg.probability);
     if (totalProb <= 0) return segments[random.nextInt(segments.length)];
-
     double roll = random.nextDouble() * totalProb;
     for (final segment in candidates) {
       roll -= segment.probability;
@@ -188,31 +207,39 @@ class SpinningWheelState extends State<SpinningWheel>
       WheelSize.medium => 300.0,
       WheelSize.large => 360.0,
     };
-
     final is3D = widget.wheel.is3D;
 
-    final wheelBase = SizedBox(
-      width: wheelSize,
-      height: wheelSize,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          CustomPaint(
-            size: Size(wheelSize, wheelSize),
-            painter: WheelPainter(
-              segments: widget.wheel.segments,
-              rotation: _currentRotation,
-              style: widget.wheel.style,
-              form: widget.wheel.form,
+    final wheelBase = AnimatedBuilder(
+      animation: _glowController,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _bounceScale,
+          child: SizedBox(
+            width: wheelSize + 16,
+            height: wheelSize + 16,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                CustomPaint(
+                  size: Size(wheelSize + 16, wheelSize + 16),
+                  painter: WheelPainter(
+                    segments: widget.wheel.segments,
+                    rotation: _currentRotation,
+                    style: widget.wheel.style,
+                    form: widget.wheel.form,
+                    glowPhase: _glowController.value,
+                  ),
+                ),
+                Positioned(
+                  top: widget.wheel.pointerPosition == PointerPosition.top ? 0 : (wheelSize + 16) / 2 - 15,
+                  right: widget.wheel.pointerPosition == PointerPosition.right ? 0 : null,
+                  child: _buildPointer(),
+                ),
+              ],
             ),
           ),
-          Positioned(
-            top: widget.wheel.pointerPosition == PointerPosition.top ? 0 : wheelSize / 2 - 15,
-            right: widget.wheel.pointerPosition == PointerPosition.right ? 0 : null,
-            child: _buildPointer(),
-          ),
-        ],
-      ),
+        );
+      },
     );
 
     if (!is3D) {
@@ -231,12 +258,11 @@ class SpinningWheelState extends State<SpinningWheel>
       onPanUpdate: _onPanUpdate,
       onPanEnd: _onPanEnd,
       child: SizedBox(
-        width: wheelSize + 40,
-        height: wheelSize + 60,
+        width: wheelSize + 56,
+        height: wheelSize + 76,
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Ground shadow — positioned behind and below the wheel
             Positioned(
               bottom: 0,
               child: Container(
@@ -255,7 +281,6 @@ class SpinningWheelState extends State<SpinningWheel>
                 ),
               ),
             ),
-            // 3D-transformed wheel
             Positioned(
               top: 0,
               child: Transform(
@@ -277,7 +302,6 @@ class SpinningWheelState extends State<SpinningWheel>
                   child: Stack(
                     children: [
                       wheelBase,
-                      // Specular highlight overlay
                       ClipOval(
                         child: SizedBox(
                           width: wheelSize,
@@ -324,7 +348,7 @@ class SpinningWheelState extends State<SpinningWheel>
     return Transform.rotate(
       angle: isTop ? 0 : -pi / 2,
       child: CustomPaint(
-        size: const Size(24, 30),
+        size: const Size(28, 34),
         painter: _PointerPainter(
           color: Theme.of(context).colorScheme.primary,
         ),
@@ -339,23 +363,51 @@ class _PointerPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-
     final path = Path()
       ..moveTo(size.width / 2, size.height)
       ..lineTo(0, 0)
       ..lineTo(size.width, 0)
       ..close();
 
-    canvas.drawPath(path, paint);
+    // Drop shadow
+    canvas.drawPath(
+      path.shift(const Offset(1, 2)),
+      Paint()
+        ..color = Colors.black.withAlpha(60)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+    );
 
-    final borderPaint = Paint()
-      ..color = Colors.white
+    // Gradient fill
+    final gradientPaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [_lighten(color, 0.2), color, _darken(color, 0.15)],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+    canvas.drawPath(path, gradientPaint);
+
+    // White border
+    canvas.drawPath(path, Paint()
+      ..color = Colors.white.withAlpha(200)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
-    canvas.drawPath(path, borderPaint);
+      ..strokeWidth = 1.5);
+
+    // Specular highlight
+    canvas.drawCircle(
+      Offset(size.width * 0.4, size.height * 0.2),
+      2.5,
+      Paint()..color = Colors.white.withAlpha(150),
+    );
+  }
+
+  static Color _lighten(Color c, double amount) {
+    final hsl = HSLColor.fromColor(c);
+    return hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0)).toColor();
+  }
+
+  static Color _darken(Color c, double amount) {
+    final hsl = HSLColor.fromColor(c);
+    return hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0)).toColor();
   }
 
   @override

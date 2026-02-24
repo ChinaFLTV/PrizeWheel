@@ -102,5 +102,9 @@
   "styleMetallic": "金屬",
   "stylePastel": "柔和",
   "styleDark": "暗黑",
-  "styleRainbow": "彩虹"
+  "styleRainbow": "彩虹",
+  "bgBlur": "高斯模糊",
+  "bgBlurIntensity": "模糊強度",
+  "bgOpacity": "背景透明度",
+  "bgOverlayColor": "疊加色調"
 }

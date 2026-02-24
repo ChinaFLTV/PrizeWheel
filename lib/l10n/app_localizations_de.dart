@@ -328,4 +328,16 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get styleRainbow => 'Regenbogen';
+
+  @override
+  String get bgBlur => 'Gaußscher Weichzeichner';
+
+  @override
+  String get bgBlurIntensity => 'Unschärfe-Intensität';
+
+  @override
+  String get bgOpacity => 'Hintergrund-Deckkraft';
+
+  @override
+  String get bgOverlayColor => 'Overlay-Farbton';
 }

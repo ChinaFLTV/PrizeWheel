@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../db/database_helper.dart';
@@ -64,6 +65,53 @@ class _WheelSpinPageState extends State<WheelSpinPage> {
     );
   }
 
+  Widget _buildBackground(String path, WheelModel wheel) {
+    Widget bg = Image.file(
+      File(path),
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+    );
+
+    // Apply opacity
+    if (wheel.bgOpacity < 1.0) {
+      bg = Opacity(opacity: wheel.bgOpacity, child: bg);
+    }
+
+    // Apply gaussian blur
+    if (wheel.bgBlurEnabled && wheel.bgBlurIntensity > 0) {
+      bg = Stack(
+        fit: StackFit.expand,
+        children: [
+          bg,
+          ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(
+                sigmaX: wheel.bgBlurIntensity,
+                sigmaY: wheel.bgBlurIntensity,
+              ),
+              child: const SizedBox.expand(),
+            ),
+          ),
+        ],
+      );
+    }
+
+    // Apply overlay color
+    final overlayColor = Color(wheel.bgOverlayColor);
+    if (overlayColor.a > 0) {
+      bg = Stack(
+        fit: StackFit.expand,
+        children: [
+          bg,
+          ColoredBox(color: overlayColor),
+        ],
+      );
+    }
+
+    return bg;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -101,12 +149,7 @@ class _WheelSpinPageState extends State<WheelSpinPage> {
         children: [
           if (hasBg)
             Positioned.fill(
-              child: Image.file(
-                File(bgPath),
-                fit: BoxFit.cover,
-                color: Colors.black.withAlpha(30),
-                colorBlendMode: BlendMode.darken,
-              ),
+              child: _buildBackground(bgPath, widget.wheel),
             ),
           Center(
             child: SingleChildScrollView(

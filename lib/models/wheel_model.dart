@@ -96,6 +96,10 @@ class WheelModel {
   bool enableSound;
   bool is3D;
   String? backgroundImagePath;
+  bool bgBlurEnabled;
+  double bgBlurIntensity;
+  double bgOpacity;
+  int bgOverlayColor;
   List<WheelSegment> segments;
   DateTime createdAt;
   DateTime updatedAt;
@@ -113,6 +117,10 @@ class WheelModel {
     this.enableSound = true,
     this.is3D = false,
     this.backgroundImagePath,
+    this.bgBlurEnabled = false,
+    this.bgBlurIntensity = 10.0,
+    this.bgOpacity = 1.0,
+    this.bgOverlayColor = 0x00000000,
     required this.segments,
     required this.createdAt,
     required this.updatedAt,
@@ -131,6 +139,10 @@ class WheelModel {
     'enableSound': enableSound ? 1 : 0,
     'is3D': is3D ? 1 : 0,
     'backgroundImagePath': backgroundImagePath,
+    'bgBlurEnabled': bgBlurEnabled ? 1 : 0,
+    'bgBlurIntensity': bgBlurIntensity,
+    'bgOpacity': bgOpacity,
+    'bgOverlayColor': bgOverlayColor,
     'segments': jsonEncode(segments.map((s) => s.toMap()).toList()),
     'createdAt': createdAt.toIso8601String(),
     'updatedAt': updatedAt.toIso8601String(),
@@ -153,6 +165,10 @@ class WheelModel {
     enableSound: (map['enableSound'] as int) == 1,
     is3D: (map['is3D'] as int?) == 1,
     backgroundImagePath: map['backgroundImagePath'] as String?,
+    bgBlurEnabled: (map['bgBlurEnabled'] as int?) == 1,
+    bgBlurIntensity: (map['bgBlurIntensity'] as num?)?.toDouble() ?? 10.0,
+    bgOpacity: (map['bgOpacity'] as num?)?.toDouble() ?? 1.0,
+    bgOverlayColor: (map['bgOverlayColor'] as int?) ?? 0x00000000,
     segments: (jsonDecode(map['segments'] as String) as List)
         .map((s) => WheelSegment.fromMap(s as Map<String, dynamic>))
         .toList(),

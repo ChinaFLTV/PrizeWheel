@@ -102,5 +102,9 @@
   "styleMetallic": "Metallic",
   "stylePastel": "Pastel",
   "styleDark": "Dark",
-  "styleRainbow": "Rainbow"
+  "styleRainbow": "Rainbow",
+  "bgBlur": "Gaussian Blur",
+  "bgBlurIntensity": "Blur Intensity",
+  "bgOpacity": "Background Opacity",
+  "bgOverlayColor": "Overlay Tint"
 }
