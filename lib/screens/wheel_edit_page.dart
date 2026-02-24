@@ -130,7 +130,10 @@ class _WheelEditPageState extends State<WheelEditPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isEditing ? l10n.editWheel : l10n.createWheel),
+        title: Text(
+          _isEditing ? l10n.editWheel : l10n.createWheel,
+          overflow: TextOverflow.ellipsis,
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.visibility_rounded),
@@ -362,17 +365,23 @@ class _WheelEditPageState extends State<WheelEditPage> {
                 Icon(Icons.pie_chart_rounded, color: theme.colorScheme.primary),
                 const SizedBox(width: 8),
                 Text(l10n.segments, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-                const Spacer(),
+              ],
+            ),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 4,
+              children: [
                 TextButton.icon(
                   onPressed: _autoBalanceProbability,
-                  icon: const Icon(Icons.balance_rounded, size: 18),
+                  icon: const Icon(Icons.balance_rounded, size: 16),
                   label: Text(l10n.probabilityAutoBalance, style: const TextStyle(fontSize: 12)),
+                  style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
                 ),
-                const SizedBox(width: 4),
                 TextButton.icon(
                   onPressed: _autoBalanceRatio,
-                  icon: const Icon(Icons.equalizer_rounded, size: 18),
+                  icon: const Icon(Icons.equalizer_rounded, size: 16),
                   label: Text(l10n.ratioAutoBalance, style: const TextStyle(fontSize: 12)),
+                  style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
                 ),
               ],
             ),
@@ -406,12 +415,13 @@ class _WheelEditPageState extends State<WheelEditPage> {
   }) {
     return DropdownButtonFormField<T>(
       initialValue: value,
+      isExpanded: true,
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
       ),
-      items: items.map((e) => DropdownMenuItem(value: e, child: Text(labelFn(e)))).toList(),
+      items: items.map((e) => DropdownMenuItem(value: e, child: Text(labelFn(e), overflow: TextOverflow.ellipsis))).toList(),
       onChanged: onChanged,
     );
   }
@@ -596,6 +606,24 @@ class _WheelEditPageState extends State<WheelEditPage> {
     );
   }
 
+  /// Proportionally scale all segment probabilities so they sum to exactly 100%.
+  void _normalizeProbabilities() {
+    final total = _segments.fold<double>(0, (sum, s) => sum + s.probability);
+    if (total <= 0 || total == 100.0) return;
+    final scale = 100.0 / total;
+    for (final s in _segments) {
+      s.probability = double.parse((s.probability * scale).toStringAsFixed(1));
+      _probControllers[s.id]?.text = s.probability.toStringAsFixed(1);
+    }
+    // Fix rounding residual: adjust the largest segment
+    final residual = 100.0 - _segments.fold<double>(0, (sum, s) => sum + s.probability);
+    if (residual.abs() > 0.001) {
+      final largest = _segments.reduce((a, b) => a.probability >= b.probability ? a : b);
+      largest.probability = double.parse((largest.probability + residual).toStringAsFixed(1));
+      _probControllers[largest.id]?.text = largest.probability.toStringAsFixed(1);
+    }
+  }
+
   void _save() {
     if (!_formKey.currentState!.validate()) return;
     if (_segments.length < 2) {
@@ -604,6 +632,9 @@ class _WheelEditPageState extends State<WheelEditPage> {
       );
       return;
     }
+
+    // Normalize probabilities so they sum to exactly 100%
+    _normalizeProbabilities();
 
     final now = DateTime.now();
     final wheel = WheelModel(
