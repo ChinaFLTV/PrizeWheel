@@ -53,6 +53,7 @@ class SpinningWheelState extends State<SpinningWheel>
 
   @override
   void dispose() {
+    _tiltResetController?.removeListener(_animateTiltReset);
     _curvedAnimation?.dispose();
     _spinController.dispose();
     _tiltResetController?.dispose();
@@ -71,6 +72,7 @@ class SpinningWheelState extends State<SpinningWheel>
     if (!widget.wheel.is3D) return;
     _tiltXStart = _tiltX;
     _tiltYStart = _tiltY;
+    _tiltResetController!.removeListener(_animateTiltReset);
     _tiltResetController!.reset();
     _tiltResetController!.addListener(_animateTiltReset);
     _tiltResetController!.forward();
@@ -83,9 +85,6 @@ class SpinningWheelState extends State<SpinningWheel>
       _tiltX = _tiltXStart * (1 - t);
       _tiltY = _tiltYStart * (1 - t);
     });
-    if (_tiltResetController!.isCompleted) {
-      _tiltResetController!.removeListener(_animateTiltReset);
-    }
   }
 
   void spin() {
@@ -108,6 +107,11 @@ class SpinningWheelState extends State<SpinningWheel>
       winnerCenterAngle += (widget.wheel.segments[i].ratio / totalRatio) * 2 * pi;
     }
     winnerCenterAngle += (winner.ratio / totalRatio) * pi;
+
+    // Adjust for pointer position: right pointer is 90° offset from top
+    if (widget.wheel.pointerPosition == PointerPosition.right) {
+      winnerCenterAngle -= pi / 2;
+    }
 
     final halfSweep = (winner.ratio / totalRatio) * pi;
     final jitter = (random.nextDouble() - 0.5) * halfSweep * 0.8;
@@ -135,15 +139,18 @@ class SpinningWheelState extends State<SpinningWheel>
       curve: Curves.easeOutCubic,
     );
 
-    _curvedAnimation!.addListener(() {
+    void onSpinTick() {
       if (!mounted) return;
       setState(() {
         _currentRotation = startRotation +
             (targetRotation - startRotation) * _curvedAnimation!.value;
       });
-    });
+    }
+
+    _curvedAnimation!.addListener(onSpinTick);
 
     _spinController.forward().then((_) {
+      _curvedAnimation?.removeListener(onSpinTick);
       if (!mounted) return;
       setState(() => _isSpinning = false);
       widget.onResult?.call(winner);
@@ -152,16 +159,17 @@ class SpinningWheelState extends State<SpinningWheel>
 
   WheelSegment _selectWinner(Random random) {
     final segments = widget.wheel.segments;
+    if (segments.isEmpty) return segments.first; // should never happen
 
+    // Collect segments with probability > 0
     final candidates = segments.where((s) => s.probability > 0).toList();
 
+    // If no probabilities set, pick uniformly at random
     if (candidates.isEmpty) {
       return segments[random.nextInt(segments.length)];
     }
 
-    final guaranteed = candidates.where((s) => s.probability >= 100).toList();
-    if (guaranteed.length == 1) return guaranteed.first;
-
+    // Weighted random selection among candidates
     final totalProb = candidates.fold<double>(0, (s, seg) => s + seg.probability);
     if (totalProb <= 0) return segments[random.nextInt(segments.length)];
 

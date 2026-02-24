@@ -29,7 +29,10 @@ class _SpinRecordsPageState extends State<SpinRecordsPage> {
     setState(() => _isLoading = true);
     try {
       _records = await _db.getSpinRecords(widget.wheelId);
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Error loading spin records: $e');
+    }
+    if (!mounted) return;
     setState(() => _isLoading = false);
   }
 
@@ -180,6 +183,7 @@ class _SpinRecordsPageState extends State<SpinRecordsPage> {
 
   void _deleteRecord(String id) {
     _db.deleteSpinRecord(id);
+    if (!mounted) return;
     setState(() => _records.removeWhere((r) => r.id == id));
   }
 
@@ -194,7 +198,10 @@ class _SpinRecordsPageState extends State<SpinRecordsPage> {
           FilledButton(
             onPressed: () {
               Navigator.pop(ctx);
-              _db.deleteAllSpinRecords(widget.wheelId);
+              _db.deleteAllSpinRecords(widget.wheelId).catchError((e) {
+                debugPrint('Error clearing spin records: $e');
+              });
+              if (!mounted) return;
               setState(() => _records.clear());
             },
             style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),

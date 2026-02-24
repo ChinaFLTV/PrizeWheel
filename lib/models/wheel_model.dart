@@ -136,15 +136,19 @@ class WheelModel {
     'updatedAt': updatedAt.toIso8601String(),
   };
 
+  static T _safeEnum<T extends Enum>(List<T> values, int index, T fallback) {
+    return (index >= 0 && index < values.length) ? values[index] : fallback;
+  }
+
   factory WheelModel.fromMap(Map<String, dynamic> map) => WheelModel(
     id: map['id'] as String,
     title: map['title'] as String,
-    style: WheelStyle.values[map['style'] as int],
-    size: WheelSize.values[map['size'] as int],
-    form: WheelForm.values[map['form'] as int],
+    style: _safeEnum(WheelStyle.values, map['style'] as int, WheelStyle.classic),
+    size: _safeEnum(WheelSize.values, map['size'] as int, WheelSize.medium),
+    form: _safeEnum(WheelForm.values, map['form'] as int, WheelForm.standard),
     spinDuration: (map['spinDuration'] as num).toDouble(),
-    spinSpeed: SpinSpeed.values[map['spinSpeed'] as int],
-    pointerPosition: PointerPosition.values[map['pointerPosition'] as int],
+    spinSpeed: _safeEnum(SpinSpeed.values, map['spinSpeed'] as int, SpinSpeed.normal),
+    pointerPosition: _safeEnum(PointerPosition.values, map['pointerPosition'] as int, PointerPosition.top),
     showResult: (map['showResult'] as int) == 1,
     enableSound: (map['enableSound'] as int) == 1,
     is3D: (map['is3D'] as int?) == 1,

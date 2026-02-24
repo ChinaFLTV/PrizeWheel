@@ -209,7 +209,10 @@ class _WheelListPageState extends State<WheelListPage> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => WheelEditPage(wheel: wheel)),
-    ).then((_) => provider.loadWheels());
+    ).then((_) {
+      if (!mounted) return;
+      provider.loadWheels();
+    });
   }
 
   void _navigateToSpin(BuildContext context, WheelModel wheel) {

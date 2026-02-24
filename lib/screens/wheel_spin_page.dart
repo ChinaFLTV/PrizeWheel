@@ -20,7 +20,7 @@ class _WheelSpinPageState extends State<WheelSpinPage> {
   final _db = DatabaseHelper();
 
   void _onResult(WheelSegment segment) {
-    // Save spin record
+    // Save spin record (fire-and-forget with error handling)
     _db.insertSpinRecord(SpinRecord(
       id: const Uuid().v4(),
       wheelId: widget.wheel.id,
@@ -28,9 +28,12 @@ class _WheelSpinPageState extends State<WheelSpinPage> {
       prizeName: segment.label,
       prizeColor: segment.color.toARGB32(),
       spinTime: DateTime.now(),
-    ));
+    )).catchError((e) {
+      debugPrint('Error saving spin record: $e');
+    });
 
     if (!widget.wheel.showResult) return;
+    if (!mounted) return;
     final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,

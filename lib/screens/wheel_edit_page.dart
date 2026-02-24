@@ -539,6 +539,7 @@ class _WheelEditPageState extends State<WheelEditPage> {
       provider.addWheel(wheel);
     }
 
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(AppLocalizations.of(context)!.savedSuccess)),
     );
@@ -548,10 +549,11 @@ class _WheelEditPageState extends State<WheelEditPage> {
   Future<void> _pickBackgroundImage() async {
     final picker = ImagePicker();
     final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
-    if (picked == null) return;
+    if (picked == null || !mounted) return;
     final appDir = await getApplicationDocumentsDirectory();
     final fileName = '${const Uuid().v4()}${p.extension(picked.path)}';
     final savedFile = await File(picked.path).copy(p.join(appDir.path, fileName));
+    if (!mounted) return;
     setState(() => _backgroundImagePath = savedFile.path);
   }
 

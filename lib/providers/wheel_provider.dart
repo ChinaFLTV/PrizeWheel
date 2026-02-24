@@ -27,24 +27,40 @@ class WheelProvider extends ChangeNotifier {
   }
 
   Future<void> addWheel(WheelModel wheel) async {
-    await _db.insertWheel(wheel);
+    try {
+      await _db.insertWheel(wheel);
+    } catch (e) {
+      debugPrint('Error adding wheel: $e');
+    }
     await loadWheels();
   }
 
   Future<void> updateWheel(WheelModel wheel) async {
-    await _db.updateWheel(wheel);
+    try {
+      await _db.updateWheel(wheel);
+    } catch (e) {
+      debugPrint('Error updating wheel: $e');
+    }
     await loadWheels();
   }
 
   Future<void> deleteWheel(String id) async {
-    await _db.deleteWheel(id);
+    try {
+      await _db.deleteWheel(id);
+    } catch (e) {
+      debugPrint('Error deleting wheel: $e');
+    }
     _selectedIds.remove(id);
     await loadWheels();
   }
 
   Future<void> deleteSelectedWheels() async {
     if (_selectedIds.isEmpty) return;
-    await _db.deleteWheels(_selectedIds.toList());
+    try {
+      await _db.deleteWheels(_selectedIds.toList());
+    } catch (e) {
+      debugPrint('Error deleting wheels: $e');
+    }
     _selectedIds.clear();
     _isSelectionMode = false;
     await loadWheels();
