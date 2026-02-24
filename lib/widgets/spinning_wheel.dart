@@ -230,85 +230,91 @@ class SpinningWheelState extends State<SpinningWheel>
     return GestureDetector(
       onPanUpdate: _onPanUpdate,
       onPanEnd: _onPanEnd,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Ground shadow
-          Transform(
-            alignment: Alignment.center,
-            transform: Matrix4.identity()
-              ..setEntry(3, 2, 0.001)
-              ..rotateX(1.2),
-            child: Container(
-              width: wheelSize * 0.85,
-              height: wheelSize * 0.18,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(wheelSize),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withAlpha(40),
-                    blurRadius: 30,
-                    spreadRadius: 5,
+      child: SizedBox(
+        width: wheelSize + 40,
+        height: wheelSize + 60,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Ground shadow — positioned behind and below the wheel
+            Positioned(
+              bottom: 0,
+              child: Container(
+                width: wheelSize * 0.75,
+                height: wheelSize * 0.10,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(wheelSize),
+                  gradient: RadialGradient(
+                    colors: [
+                      Colors.black.withAlpha(35),
+                      Colors.black.withAlpha(10),
+                      Colors.transparent,
+                    ],
+                    stops: const [0.0, 0.5, 1.0],
                   ),
-                ],
+                ),
               ),
             ),
-          ),
-          Transform(
-            alignment: Alignment.center,
-            transform: transform,
-            child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withAlpha(
-                      50 + ((_tiltX.abs() + _tiltY.abs()) * 40).toInt().clamp(0, 80),
-                    ),
-                    blurRadius: 20 + (_tiltX.abs() + _tiltY.abs()) * 15,
-                    offset: Offset(_tiltY * 20, -_tiltX * 20),
+            // 3D-transformed wheel
+            Positioned(
+              top: 0,
+              child: Transform(
+                alignment: Alignment.center,
+                transform: transform,
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(
+                          50 + ((_tiltX.abs() + _tiltY.abs()) * 40).toInt().clamp(0, 80),
+                        ),
+                        blurRadius: 20 + (_tiltX.abs() + _tiltY.abs()) * 15,
+                        offset: Offset(_tiltY * 20, -_tiltX * 20),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: Stack(
-                children: [
-                  wheelBase,
-                  // Specular highlight overlay
-                  ClipOval(
-                    child: SizedBox(
-                      width: wheelSize,
-                      height: wheelSize,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment(
-                              (-_tiltY * 2).clamp(-1.0, 1.0),
-                              (_tiltX * 2).clamp(-1.0, 1.0),
-                            ),
-                            end: Alignment(
-                              (_tiltY * 2).clamp(-1.0, 1.0),
-                              (-_tiltX * 2).clamp(-1.0, 1.0),
-                            ),
-                            colors: [
-                              Colors.white.withAlpha(
-                                (30 + (_tiltX.abs() + _tiltY.abs()) * 50).toInt().clamp(0, 80),
+                  child: Stack(
+                    children: [
+                      wheelBase,
+                      // Specular highlight overlay
+                      ClipOval(
+                        child: SizedBox(
+                          width: wheelSize,
+                          height: wheelSize,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: RadialGradient(
+                                center: Alignment(
+                                  (-_tiltY * 1.5).clamp(-0.8, 0.8),
+                                  (_tiltX * 1.5).clamp(-0.8, 0.8),
+                                ),
+                                radius: 0.9,
+                                colors: [
+                                  Colors.white.withAlpha(
+                                    (20 + (_tiltX.abs() + _tiltY.abs()) * 60).toInt().clamp(0, 90),
+                                  ),
+                                  Colors.white.withAlpha(
+                                    (5 + (_tiltX.abs() + _tiltY.abs()) * 15).toInt().clamp(0, 30),
+                                  ),
+                                  Colors.transparent,
+                                  Colors.black.withAlpha(
+                                    ((_tiltX.abs() + _tiltY.abs()) * 20).toInt().clamp(0, 40),
+                                  ),
+                                ],
+                                stops: const [0.0, 0.25, 0.6, 1.0],
                               ),
-                              Colors.transparent,
-                              Colors.black.withAlpha(
-                                ((_tiltX.abs() + _tiltY.abs()) * 25).toInt().clamp(0, 50),
-                              ),
-                            ],
-                            stops: const [0.0, 0.5, 1.0],
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
